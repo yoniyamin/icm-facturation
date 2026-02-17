@@ -1,0 +1,98 @@
+{
+  "app": {
+    "title": "ICM Administration",
+    "subtitle": "אפליקציית ניהול ICM",
+    "scanReceipt": "סרוק קבלה",
+    "takePhoto": "צלם תמונה",
+    "uploadImage": "העלה תמונה",
+    "or": "או"
+  },
+  "ocr": {
+    "processing": "מעבד תמונה...",
+    "loading": "טוען מנוע זיהוי טקסט...",
+    "recognizing": "מזהה טקסט...",
+    "complete": "הזיהוי הושלם",
+    "error": "שגיאה בזיהוי הטקסט",
+    "retry": "נסה שוב",
+    "progress": "התקדמות"
+  },
+  "preview": {
+    "title": "נתונים שזוהו",
+    "subtitle": "בדוק ותקן את הנתונים שחולצו מהקבלה",
+    "extractedText": "טקסט שחולץ",
+    "noText": "לא זוהה טקסט. אנא נסה שוב עם תמונה ברורה יותר.",
+    "continue": "המשך",
+    "retake": "צלם מחדש",
+    "identifiedFields": "שדות שזוהו",
+    "additionalText": "טקסט נוסף",
+    "revertChanges": "שחזר שינויים",
+    "edited": "נערך",
+    "expand": "הגדל",
+    "shrink": "הקטן",
+    "selectToAssign": "סמן טקסט כדי לשייך אותו לשדה",
+    "assignField": "שייך לשדה:",
+    "allFieldsAssigned": "כל השדות כבר מוקצים",
+    "customFieldPlaceholder": "שם שדה חדש...",
+    "custom": "מותאם אישית",
+    "confidence": {
+      "high": "זיהוי גבוה",
+      "medium": "זיהוי בינוני",
+      "low": "זיהוי נמוך"
+    }
+  },
+  "fields": {
+    "amount": "סכום",
+    "date": "תאריך",
+    "receiptNumber": "מספר קבלה",
+    "phone": "טלפון",
+    "businessName": "שם העסק",
+    "address": "כתובת",
+    "taxId": "מספר עוסק / ח.פ.",
+    "notes": "הערות"
+  },
+  "form": {
+    "title": "פרטי קבלה",
+    "subtitle": "מלא את הפרטים הבאים",
+    "receiptNumber": "מספר קבלה",
+    "receiptNumberPlaceholder": "הכנס מספר קבלה",
+    "projectName": "שם פרויקט",
+    "projectNamePlaceholder": "הכנס שם פרויקט",
+    "subject": "נושא",
+    "selectSubject": "בחר נושא",
+    "amount": "סכום",
+    "amountPlaceholder": "0.00",
+    "currency": "₪",
+    "submit": "שלח",
+    "submitting": "שולח...",
+    "back": "חזור",
+    "required": "שדה חובה"
+  },
+  "subjects": {
+    "food": "אוכל",
+    "arts_and_craft": "אומנות ויצירה",
+    "snacks": "חטיפים",
+    "office_supplies": "ציוד משרדי",
+    "transportation": "תחבורה",
+    "cleaning": "ניקיון",
+    "equipment": "ציוד",
+    "other": "אחר"
+  },
+  "success": {
+    "title": "הקבלה נשמרה בהצלחה!",
+    "subtitle": "הנתונים הועלו ל-Google Drive והגיליון עודכן.",
+    "subtitleLocal": "הנתונים נשמרו בתיקייה המקומית במכשיר.",
+    "savedTo": "נשמר בתיקייה:",
+    "driveLink": "צפה ב-Google Drive",
+    "sheetLink": "צפה בגיליון",
+    "scanAnother": "סרוק קבלה נוספת"
+  },
+  "errors": {
+    "uploadFailed": "השליחה נכשלה. אנא נסה שוב.",
+    "cameraAccess": "לא ניתן לגשת למצלמה",
+    "invalidImage": "קובץ לא תקין. אנא בחר תמונה.",
+    "networkError": "שגיאת רשת. בדוק את החיבור לאינטרנט."
+  },
+  "language": {
+    "select": "שפה"
+  }
+}

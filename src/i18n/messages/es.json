@@ -1,0 +1,98 @@
+{
+  "app": {
+    "title": "ICM Administration",
+    "subtitle": "Aplicación de gestión ICM",
+    "scanReceipt": "Escanear Recibo",
+    "takePhoto": "Tomar Foto",
+    "uploadImage": "Subir Imagen",
+    "or": "o"
+  },
+  "ocr": {
+    "processing": "Procesando imagen...",
+    "loading": "Cargando motor OCR...",
+    "recognizing": "Reconociendo texto...",
+    "complete": "Reconocimiento completo",
+    "error": "Error al reconocer texto",
+    "retry": "Intentar de nuevo",
+    "progress": "Progreso"
+  },
+  "preview": {
+    "title": "Datos Extraídos",
+    "subtitle": "Revisa y corrige los datos extraídos del recibo",
+    "extractedText": "Texto Extraído",
+    "noText": "No se detectó texto. Intenta de nuevo con una imagen más clara.",
+    "continue": "Continuar",
+    "retake": "Volver a tomar",
+    "identifiedFields": "Campos Identificados",
+    "additionalText": "Texto Adicional",
+    "revertChanges": "Revertir Cambios",
+    "edited": "editado",
+    "expand": "Ampliar",
+    "shrink": "Reducir",
+    "selectToAssign": "Selecciona texto para asignarlo a un campo",
+    "assignField": "Asignar al campo:",
+    "allFieldsAssigned": "Todos los campos ya están asignados",
+    "customFieldPlaceholder": "Nombre de campo personalizado...",
+    "custom": "personalizado",
+    "confidence": {
+      "high": "Alta confianza",
+      "medium": "Confianza media",
+      "low": "Baja confianza"
+    }
+  },
+  "fields": {
+    "amount": "Monto",
+    "date": "Fecha",
+    "receiptNumber": "Número de Recibo",
+    "phone": "Teléfono",
+    "businessName": "Nombre del Negocio",
+    "address": "Dirección",
+    "taxId": "NIF / CIF",
+    "notes": "Notas"
+  },
+  "form": {
+    "title": "Detalles del Recibo",
+    "subtitle": "Completa los siguientes datos",
+    "receiptNumber": "Número de Recibo",
+    "receiptNumberPlaceholder": "Ingresa número de recibo",
+    "projectName": "Nombre del Proyecto",
+    "projectNamePlaceholder": "Ingresa nombre del proyecto",
+    "subject": "Tema",
+    "selectSubject": "Selecciona un tema",
+    "amount": "Monto",
+    "amountPlaceholder": "0.00",
+    "currency": "₪",
+    "submit": "Enviar",
+    "submitting": "Enviando...",
+    "back": "Volver",
+    "required": "Campo obligatorio"
+  },
+  "subjects": {
+    "food": "Comida",
+    "arts_and_craft": "Arte y Manualidades",
+    "snacks": "Bocadillos",
+    "office_supplies": "Suministros de Oficina",
+    "transportation": "Transporte",
+    "cleaning": "Limpieza",
+    "equipment": "Equipamiento",
+    "other": "Otro"
+  },
+  "success": {
+    "title": "¡Recibo guardado exitosamente!",
+    "subtitle": "Los datos se han subido a Google Drive y la hoja se ha actualizado.",
+    "subtitleLocal": "Los datos se han guardado en la carpeta local del dispositivo.",
+    "savedTo": "Guardado en la carpeta:",
+    "driveLink": "Ver en Google Drive",
+    "sheetLink": "Ver Hoja",
+    "scanAnother": "Escanear Otro Recibo"
+  },
+  "errors": {
+    "uploadFailed": "Error al enviar. Intenta de nuevo.",
+    "cameraAccess": "No se puede acceder a la cámara",
+    "invalidImage": "Archivo inválido. Selecciona una imagen.",
+    "networkError": "Error de red. Verifica tu conexión a internet."
+  },
+  "language": {
+    "select": "Idioma"
+  }
+}
