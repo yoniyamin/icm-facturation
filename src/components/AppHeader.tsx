@@ -1,12 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { Receipt } from "lucide-react";
+import ConnectionStatus from "./ConnectionStatus";
 
 export default function AppHeader() {
   const t = useTranslations("app");
-  const isLocalMode = process.env.NEXT_PUBLIC_STORAGE_MODE === "local";
 
   return (
     <header className="sticky top-0 z-50 border-b border-primary-200 bg-primary-500/95 backdrop-blur-sm">
@@ -23,11 +24,7 @@ export default function AppHeader() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {isLocalMode && (
-            <span className="rounded-md bg-accent-400 px-2 py-0.5 text-[10px] font-bold text-white">
-              LOCAL
-            </span>
-          )}
+          <ConnectionStatus />
           <LanguageSwitcher />
         </div>
       </div>

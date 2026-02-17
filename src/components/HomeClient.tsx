@@ -7,7 +7,6 @@ import OcrProcessor from "@/components/OcrProcessor";
 import DataPreview from "@/components/DataPreview";
 import MetadataForm from "@/components/MetadataForm";
 import SuccessScreen from "@/components/SuccessScreen";
-import { isLocalMode } from "@/lib/local-storage";
 
 type AppStep = "capture" | "ocr" | "preview" | "form" | "success";
 
@@ -22,6 +21,7 @@ interface ReceiptData {
   driveLink?: string;
   sheetLink?: string;
   storagePath?: string;
+  resultMode?: string;
 }
 
 export default function HomeClient() {
@@ -91,17 +91,16 @@ export default function HomeClient() {
       amount: formData.amount,
     };
 
-    const endpoint = isLocalMode() ? "/api/save-local" : "/api/upload";
-
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch("/api/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error("Upload failed");
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Upload failed");
       }
 
       const result = await response.json();
@@ -110,6 +109,7 @@ export default function HomeClient() {
         driveLink: result.driveLink,
         sheetLink: result.sheetLink,
         storagePath: result.storagePath,
+        resultMode: result.mode,
       }));
       setStep("success");
     } catch {
@@ -169,6 +169,7 @@ export default function HomeClient() {
             driveLink={receiptData.driveLink}
             sheetLink={receiptData.sheetLink}
             storagePath={receiptData.storagePath}
+            resultMode={receiptData.resultMode}
             onScanAnother={handleScanAnother}
           />
         )}

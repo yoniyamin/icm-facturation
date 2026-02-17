@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import path from "path";
 import { uploadImageToDrive } from "@/lib/google-drive";
 import { appendToSheet, ensureHeaders } from "@/lib/google-sheets";
+import { saveReceiptToDisk } from "@/lib/disk-storage";
 
 export const maxDuration = 60;
 
@@ -11,6 +13,26 @@ interface UploadRequestBody {
   projectName: string;
   subject: string;
   amount: string;
+}
+
+function isGoogleConfigured(): boolean {
+  return !!(
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
+    process.env.GOOGLE_PRIVATE_KEY &&
+    process.env.GOOGLE_PRIVATE_KEY !== "-----BEGIN PRIVATE KEY-----\\nYOUR_KEY_HERE\\n-----END PRIVATE KEY-----\\n" &&
+    process.env.GOOGLE_DRIVE_FOLDER_ID &&
+    process.env.GOOGLE_DRIVE_FOLDER_ID !== "your-folder-id-here" &&
+    process.env.GOOGLE_SHEET_ID &&
+    process.env.GOOGLE_SHEET_ID !== "your-sheet-id-here"
+  );
+}
+
+function getEffectiveMode(): "google" | "local" {
+  if (process.env.NEXT_PUBLIC_STORAGE_MODE === "local") return "local";
+  if (process.env.NEXT_PUBLIC_STORAGE_MODE === "google" && isGoogleConfigured())
+    return "google";
+  if (isGoogleConfigured()) return "google";
+  return "local";
 }
 
 export async function POST(request: NextRequest) {
@@ -30,33 +52,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const timestamp = new Date();
-    const dateStr = timestamp.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-    const fileName = `receipt_${body.receiptNumber}_${timestamp.getTime()}.jpg`;
+    const mode = getEffectiveMode();
 
-    const driveResult = await uploadImageToDrive(body.imageDataUrl, fileName);
+    if (mode === "google") {
+      const timestamp = new Date();
+      const dateStr = timestamp.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+      const fileName = `receipt_${body.receiptNumber}_${timestamp.getTime()}.jpg`;
 
-    await ensureHeaders();
+      const driveResult = await uploadImageToDrive(
+        body.imageDataUrl,
+        fileName
+      );
 
-    const sheetLink = await appendToSheet({
-      date: dateStr,
+      await ensureHeaders();
+
+      const sheetLink = await appendToSheet({
+        date: dateStr,
+        receiptNumber: body.receiptNumber,
+        projectName: body.projectName,
+        subject: body.subject,
+        amount: body.amount,
+        imageLink: driveResult.webViewLink,
+        ocrText: body.ocrText || "",
+      });
+
+      return NextResponse.json({
+        success: true,
+        mode: "google",
+        driveLink: driveResult.webViewLink,
+        sheetLink,
+        fileId: driveResult.fileId,
+      });
+    }
+
+    // Local disk mode
+    const entry = saveReceiptToDisk({
       receiptNumber: body.receiptNumber,
       projectName: body.projectName,
       subject: body.subject,
       amount: body.amount,
-      imageLink: driveResult.webViewLink,
       ocrText: body.ocrText || "",
+      imageDataUrl: body.imageDataUrl,
     });
+
+    const storagePath =
+      process.env.LOCAL_STORAGE_PATH ||
+      path.join(process.cwd(), "receipts");
 
     return NextResponse.json({
       success: true,
-      driveLink: driveResult.webViewLink,
-      sheetLink,
-      fileId: driveResult.fileId,
+      mode: "local",
+      entry,
+      storagePath,
     });
   } catch (error) {
     console.error("Upload error:", error);
