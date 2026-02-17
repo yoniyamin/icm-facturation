@@ -8,12 +8,12 @@ import {
   ScanLine,
   FolderOpen,
 } from "lucide-react";
-import { isLocalMode } from "@/lib/local-storage";
 
 interface SuccessScreenProps {
   driveLink?: string;
   sheetLink?: string;
   storagePath?: string;
+  resultMode?: string;
   onScanAnother: () => void;
 }
 
@@ -21,10 +21,11 @@ export default function SuccessScreen({
   driveLink,
   sheetLink,
   storagePath,
+  resultMode,
   onScanAnother,
 }: SuccessScreenProps) {
   const t = useTranslations("success");
-  const localMode = isLocalMode();
+  const isLocal = resultMode === "local";
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6">
@@ -38,12 +39,12 @@ export default function SuccessScreen({
       <div className="text-center">
         <h2 className="text-xl font-bold text-primary-900">{t("title")}</h2>
         <p className="mt-1 text-sm text-gray-500">
-          {localMode ? t("subtitleLocal") : t("subtitle")}
+          {isLocal ? t("subtitleLocal") : t("subtitle")}
         </p>
       </div>
 
       <div className="flex w-full flex-col gap-3">
-        {localMode && storagePath && (
+        {isLocal && storagePath && (
           <div className="rounded-xl border-2 border-accent-200 bg-accent-50 p-3">
             <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-accent-700">
               <FolderOpen className="h-4 w-4" />
