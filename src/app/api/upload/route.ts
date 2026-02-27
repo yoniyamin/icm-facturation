@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { uploadToCloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
 import { appendToSheet, ensureHeaders } from "@/lib/google-sheets";
 import { saveReceiptToDisk } from "@/lib/disk-storage";
@@ -53,6 +55,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const session = await getServerSession(authOptions);
+    const scannedBy = session?.user?.email ?? "unknown";
+
     const mode = getEffectiveMode();
 
     if (mode === "cloud") {
@@ -85,6 +90,7 @@ export async function POST(request: NextRequest) {
         amount: body.amount,
         imageLink: cloudinaryResult.secureUrl,
         ocrText: body.ocrText || "",
+        scannedBy,
       });
 
       return NextResponse.json({
@@ -102,6 +108,7 @@ export async function POST(request: NextRequest) {
       subject: body.subject,
       amount: body.amount,
       ocrText: body.ocrText || "",
+      scannedBy,
       imageDataUrl: body.imageDataUrl,
     });
 

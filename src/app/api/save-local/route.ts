@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { saveReceiptToDisk } from "@/lib/disk-storage";
 
 interface SaveLocalRequestBody {
@@ -27,12 +29,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const session = await getServerSession(authOptions);
+    const scannedBy = session?.user?.email ?? "unknown";
+
     const entry = saveReceiptToDisk({
       receiptNumber: body.receiptNumber,
       projectName: body.projectName,
       subject: body.subject,
       amount: body.amount,
       ocrText: body.ocrText || "",
+      scannedBy,
       imageDataUrl: body.imageDataUrl,
     });
 

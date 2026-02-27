@@ -15,6 +15,7 @@ export interface DiskReceiptEntry {
   subject: string;
   amount: string;
   ocrText: string;
+  scannedBy: string;
   imageFileName: string;
   imagePath: string;
 }
@@ -43,6 +44,7 @@ export function saveReceiptToDisk(data: {
   subject: string;
   amount: string;
   ocrText: string;
+  scannedBy: string;
   imageDataUrl: string;
 }): DiskReceiptEntry {
   const storagePath = getStoragePath();
@@ -76,6 +78,7 @@ export function saveReceiptToDisk(data: {
     subject: data.subject,
     amount: data.amount,
     ocrText: data.ocrText,
+    scannedBy: data.scannedBy,
     imageFileName,
     imagePath: path.join(sanitizeDirName(data.projectName), imageFileName),
   };

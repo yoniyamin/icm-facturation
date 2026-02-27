@@ -8,6 +8,7 @@ export interface SheetEntry {
   amount: string;
   imageLink: string;
   ocrText: string;
+  scannedBy: string;
 }
 
 export async function appendToSheet(entry: SheetEntry): Promise<string> {
@@ -25,7 +26,7 @@ export async function appendToSheet(entry: SheetEntry): Promise<string> {
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
-    range: "Sheet1!A:G",
+    range: "Sheet1!A:H",
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [
@@ -37,6 +38,7 @@ export async function appendToSheet(entry: SheetEntry): Promise<string> {
           entry.amount,
           entry.imageLink,
           truncatedOcrText,
+          entry.scannedBy,
         ],
       ],
     },
@@ -85,14 +87,14 @@ export async function ensureHeaders(): Promise<void> {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: "Sheet1!A1:G1",
+      range: "Sheet1!A1:H1",
     });
 
     const firstRow = response.data.values?.[0];
     if (!firstRow || firstRow.length === 0) {
       await sheets.spreadsheets.values.update({
         spreadsheetId: sheetId,
-        range: "Sheet1!A1:G1",
+        range: "Sheet1!A1:H1",
         valueInputOption: "RAW",
         requestBody: {
           values: [
@@ -104,6 +106,7 @@ export async function ensureHeaders(): Promise<void> {
               "Amount",
               "Image Link",
               "OCR Text",
+              "Scanned By",
             ],
           ],
         },
