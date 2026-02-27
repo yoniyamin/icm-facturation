@@ -18,7 +18,7 @@ interface ReceiptData {
   subject: string;
   amount: string;
   parsedFields: Record<string, string>;
-  driveLink?: string;
+  imageLink?: string;
   sheetLink?: string;
   storagePath?: string;
   resultMode?: string;
@@ -106,7 +106,7 @@ export default function HomeClient() {
       const result = await response.json();
       setReceiptData((prev) => ({
         ...prev,
-        driveLink: result.driveLink,
+        imageLink: result.imageLink,
         sheetLink: result.sheetLink,
         storagePath: result.storagePath,
         resultMode: result.mode,
@@ -166,7 +166,7 @@ export default function HomeClient() {
         )}
         {step === "success" && (
           <SuccessScreen
-            driveLink={receiptData.driveLink}
+            imageLink={receiptData.imageLink}
             sheetLink={receiptData.sheetLink}
             storagePath={receiptData.storagePath}
             resultMode={receiptData.resultMode}

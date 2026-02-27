@@ -45,6 +45,37 @@ export async function appendToSheet(entry: SheetEntry): Promise<string> {
   return `https://docs.google.com/spreadsheets/d/${sheetId}`;
 }
 
+export async function getUniqueOptions(): Promise<{
+  projects: string[];
+  subjects: string[];
+}> {
+  const sheetId = process.env.GOOGLE_SHEET_ID;
+  if (!sheetId) return { projects: [], subjects: [] };
+
+  const sheets = getSheetsClient();
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: "Sheet1!C2:D",
+  });
+
+  const rows = response.data.values ?? [];
+  const projects = new Set<string>();
+  const subjects = new Set<string>();
+
+  for (const row of rows) {
+    const project = row[0]?.trim();
+    const subject = row[1]?.trim();
+    if (project) projects.add(project);
+    if (subject) subjects.add(subject);
+  }
+
+  return {
+    projects: Array.from(projects).sort((a, b) => a.localeCompare(b)),
+    subjects: Array.from(subjects).sort((a, b) => a.localeCompare(b)),
+  };
+}
+
 export async function ensureHeaders(): Promise<void> {
   const sheetId = process.env.GOOGLE_SHEET_ID;
   if (!sheetId) return;

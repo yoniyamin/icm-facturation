@@ -8,13 +8,13 @@ import {
   Loader2,
 } from "lucide-react";
 
-type StatusState = "loading" | "google" | "local" | "error";
+type StatusState = "loading" | "cloud" | "local" | "error";
 
 interface StatusData {
-  mode: "google" | "local";
-  google: {
+  mode: "cloud" | "local";
+  services: {
     configured: boolean;
-    driveConnected: boolean;
+    cloudinaryConnected: boolean;
     sheetsConnected: boolean;
     error?: string;
   };
@@ -29,19 +29,23 @@ export default function ConnectionStatus() {
     fetch("/api/status")
       .then((res) => res.json())
       .then((data: StatusData) => {
-        if (data.mode === "google" && data.google.driveConnected && data.google.sheetsConnected) {
-          setStatus("google");
-          setDetail("Google Drive + Sheets connected");
+        if (
+          data.mode === "cloud" &&
+          data.services.cloudinaryConnected &&
+          data.services.sheetsConnected
+        ) {
+          setStatus("cloud");
+          setDetail("Cloudinary + Sheets connected");
         } else if (data.mode === "local") {
           setStatus("local");
           setDetail(
-            data.google.configured
-              ? data.google.error || "Google connection failed, using local"
-              : "Local storage mode"
+            data.services.configured
+              ? data.services.error || "Connection failed, using local"
+              : data.services.error || "Local storage mode"
           );
         } else {
           setStatus("error");
-          setDetail(data.google.error || "Connection issue");
+          setDetail(data.services.error || "Connection issue");
         }
       })
       .catch(() => {
@@ -57,11 +61,11 @@ export default function ConnectionStatus() {
       bg: "bg-white/20",
       label: "...",
     },
-    google: {
+    cloud: {
       icon: Cloud,
       className: "text-green-300",
       bg: "bg-green-500/30",
-      label: "Google",
+      label: "Cloud",
     },
     local: {
       icon: HardDrive,
@@ -93,7 +97,7 @@ export default function ConnectionStatus() {
       {showTooltip && detail && (
         <div className="absolute top-full end-0 z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white p-2 text-xs text-gray-600 shadow-xl">
           <div className="flex items-start gap-2">
-            {status === "google" && (
+            {status === "cloud" && (
               <Cloud className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-500" />
             )}
             {status === "local" && (

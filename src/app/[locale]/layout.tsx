@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales, localeDirection, type Locale } from "@/i18n/config";
 import type { Viewport, Metadata } from "next";
+import AuthProvider from "@/components/AuthProvider";
 import "@/app/globals.css";
 
 export function generateStaticParams() {
@@ -49,9 +50,11 @@ export default function LocaleLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className="min-h-screen bg-warm-100 antialiased">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <AuthProvider>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );

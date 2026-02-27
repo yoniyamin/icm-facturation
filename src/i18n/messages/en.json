@@ -65,7 +65,10 @@
     "submit": "Submit",
     "submitting": "Submitting...",
     "back": "Back",
-    "required": "Required field"
+    "required": "Required field",
+    "searchProject": "Search or add project...",
+    "searchSubject": "Search or add subject...",
+    "newItem": "Add \"{name}\""
   },
   "subjects": {
     "food": "Food",
@@ -79,10 +82,10 @@
   },
   "success": {
     "title": "Receipt saved successfully!",
-    "subtitle": "Data has been uploaded to Google Drive and the sheet has been updated.",
+    "subtitle": "The receipt image has been saved and the sheet has been updated.",
     "subtitleLocal": "Data has been saved to the local folder on the device.",
     "savedTo": "Saved to folder:",
-    "driveLink": "View in Google Drive",
+    "imageLink": "View Receipt Image",
     "sheetLink": "View Sheet",
     "scanAnother": "Scan Another Receipt"
   },
@@ -94,5 +97,10 @@
   },
   "language": {
     "select": "Language"
+  },
+  "auth": {
+    "signIn": "Sign in with Google",
+    "signOut": "Sign out",
+    "notAuthorized": "Your email is not authorized to use this app."
   }
 }

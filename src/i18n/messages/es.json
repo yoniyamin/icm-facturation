@@ -65,7 +65,10 @@
     "submit": "Enviar",
     "submitting": "Enviando...",
     "back": "Volver",
-    "required": "Campo obligatorio"
+    "required": "Campo obligatorio",
+    "searchProject": "Buscar o agregar proyecto...",
+    "searchSubject": "Buscar o agregar tema...",
+    "newItem": "Agregar \"{name}\""
   },
   "subjects": {
     "food": "Comida",
@@ -79,10 +82,10 @@
   },
   "success": {
     "title": "¡Recibo guardado exitosamente!",
-    "subtitle": "Los datos se han subido a Google Drive y la hoja se ha actualizado.",
+    "subtitle": "La imagen del recibo se ha guardado y la hoja se ha actualizado.",
     "subtitleLocal": "Los datos se han guardado en la carpeta local del dispositivo.",
     "savedTo": "Guardado en la carpeta:",
-    "driveLink": "Ver en Google Drive",
+    "imageLink": "Ver Imagen del Recibo",
     "sheetLink": "Ver Hoja",
     "scanAnother": "Escanear Otro Recibo"
   },
@@ -94,5 +97,10 @@
   },
   "language": {
     "select": "Idioma"
+  },
+  "auth": {
+    "signIn": "Iniciar sesion con Google",
+    "signOut": "Cerrar sesion",
+    "notAuthorized": "Tu correo no esta autorizado para usar esta aplicacion."
   }
 }
