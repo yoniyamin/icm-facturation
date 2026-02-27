@@ -13,17 +13,10 @@ export function getGoogleAuth() {
   const auth = new google.auth.JWT({
     email,
     key: privateKey,
-    scopes: [
-      "https://www.googleapis.com/auth/drive.file",
-      "https://www.googleapis.com/auth/spreadsheets",
-    ],
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
 
   return auth;
-}
-
-export function getDriveClient() {
-  return google.drive({ version: "v3", auth: getGoogleAuth() });
 }
 
 export function getSheetsClient() {

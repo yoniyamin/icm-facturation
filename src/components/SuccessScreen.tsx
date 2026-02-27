@@ -7,10 +7,11 @@ import {
   FileSpreadsheet,
   ScanLine,
   FolderOpen,
+  Image,
 } from "lucide-react";
 
 interface SuccessScreenProps {
-  driveLink?: string;
+  imageLink?: string;
   sheetLink?: string;
   storagePath?: string;
   resultMode?: string;
@@ -18,7 +19,7 @@ interface SuccessScreenProps {
 }
 
 export default function SuccessScreen({
-  driveLink,
+  imageLink,
   sheetLink,
   storagePath,
   resultMode,
@@ -58,15 +59,15 @@ export default function SuccessScreen({
             </p>
           </div>
         )}
-        {driveLink && (
+        {imageLink && (
           <a
-            href={driveLink}
+            href={imageLink}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 rounded-xl border-2 border-primary-200 bg-white px-4 py-3 text-sm font-semibold text-primary-700 transition-colors hover:border-primary-400 hover:bg-primary-50"
           >
-            <ExternalLink className="h-4 w-4" />
-            {t("driveLink")}
+            <Image className="h-4 w-4" />
+            {t("imageLink")}
           </a>
         )}
         {sheetLink && (

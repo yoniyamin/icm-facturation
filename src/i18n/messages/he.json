@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "ICM Administration",
-    "subtitle": "אפליקציית ניהול ICM",
+    "subtitle": "אפליקציית ניהול חשבוניות ICM",
     "scanReceipt": "סרוק קבלה",
     "takePhoto": "צלם תמונה",
     "uploadImage": "העלה תמונה",
@@ -65,7 +65,10 @@
     "submit": "שלח",
     "submitting": "שולח...",
     "back": "חזור",
-    "required": "שדה חובה"
+    "required": "שדה חובה",
+    "searchProject": "חפש או הוסף פרויקט...",
+    "searchSubject": "חפש או הוסף נושא...",
+    "newItem": "הוסף \"{name}\""
   },
   "subjects": {
     "food": "אוכל",
@@ -79,10 +82,10 @@
   },
   "success": {
     "title": "הקבלה נשמרה בהצלחה!",
-    "subtitle": "הנתונים הועלו ל-Google Drive והגיליון עודכן.",
+    "subtitle": "תמונת הקבלה נשמרה והגיליון עודכן.",
     "subtitleLocal": "הנתונים נשמרו בתיקייה המקומית במכשיר.",
     "savedTo": "נשמר בתיקייה:",
-    "driveLink": "צפה ב-Google Drive",
+    "imageLink": "צפה בתמונת הקבלה",
     "sheetLink": "צפה בגיליון",
     "scanAnother": "סרוק קבלה נוספת"
   },
@@ -94,5 +97,10 @@
   },
   "language": {
     "select": "שפה"
+  },
+  "auth": {
+    "signIn": "התחבר עם Google",
+    "signOut": "התנתק",
+    "notAuthorized": "כתובת האימייל שלך אינה מורשית לשימוש באפליקציה."
   }
 }

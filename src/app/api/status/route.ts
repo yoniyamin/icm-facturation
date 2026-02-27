@@ -1,60 +1,62 @@
 import { NextResponse } from "next/server";
-import { getDriveClient, getSheetsClient } from "@/lib/google-auth";
+import { getSheetsClient } from "@/lib/google-auth";
+import { isCloudinaryConfigured, pingCloudinary } from "@/lib/cloudinary";
 
 export const dynamic = "force-dynamic";
 
 interface StatusResult {
-  mode: "google" | "local";
-  google: {
+  mode: "cloud" | "local";
+  services: {
     configured: boolean;
-    driveConnected: boolean;
+    cloudinaryConnected: boolean;
     sheetsConnected: boolean;
     error?: string;
   };
 }
 
-function isGoogleConfigured(): boolean {
+function isSheetsConfigured(): boolean {
   return !!(
     process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
     process.env.GOOGLE_PRIVATE_KEY &&
-    process.env.GOOGLE_PRIVATE_KEY !== "-----BEGIN PRIVATE KEY-----\\nYOUR_KEY_HERE\\n-----END PRIVATE KEY-----\\n" &&
-    process.env.GOOGLE_DRIVE_FOLDER_ID &&
-    process.env.GOOGLE_DRIVE_FOLDER_ID !== "your-folder-id-here" &&
+    process.env.GOOGLE_PRIVATE_KEY !==
+      '-----BEGIN PRIVATE KEY-----\\nYOUR_KEY_HERE\\n-----END PRIVATE KEY-----\\n' &&
     process.env.GOOGLE_SHEET_ID &&
     process.env.GOOGLE_SHEET_ID !== "your-sheet-id-here"
   );
 }
 
 export async function GET() {
-  const configured = isGoogleConfigured();
+  const cloudinaryOk = isCloudinaryConfigured();
+  const sheetsOk = isSheetsConfigured();
+  const configured = cloudinaryOk && sheetsOk;
 
   if (!configured) {
+    const missing: string[] = [];
+    if (!cloudinaryOk) missing.push("Cloudinary");
+    if (!sheetsOk) missing.push("Google Sheets");
+
     return NextResponse.json({
       mode: "local",
-      google: {
+      services: {
         configured: false,
-        driveConnected: false,
+        cloudinaryConnected: false,
         sheetsConnected: false,
-        error: "Google credentials not configured",
+        error: `Not configured: ${missing.join(", ")}`,
       },
     } satisfies StatusResult);
   }
 
-  let driveConnected = false;
+  let cloudinaryConnected = false;
   let sheetsConnected = false;
   let error: string | undefined;
 
   try {
-    const drive = getDriveClient();
-    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID!;
-    await drive.files.list({
-      q: `'${folderId}' in parents`,
-      pageSize: 1,
-      fields: "files(id)",
-    });
-    driveConnected = true;
+    cloudinaryConnected = await pingCloudinary();
+    if (!cloudinaryConnected) {
+      error = "Cloudinary: authentication failed";
+    }
   } catch (e) {
-    error = `Drive: ${e instanceof Error ? e.message : "Connection failed"}`;
+    error = `Cloudinary: ${e instanceof Error ? e.message : "Connection failed"}`;
   }
 
   try {
@@ -73,15 +75,15 @@ export async function GET() {
   const mode =
     process.env.NEXT_PUBLIC_STORAGE_MODE === "local"
       ? "local"
-      : driveConnected && sheetsConnected
-        ? "google"
+      : cloudinaryConnected && sheetsConnected
+        ? "cloud"
         : "local";
 
   return NextResponse.json({
     mode,
-    google: {
+    services: {
       configured,
-      driveConnected,
+      cloudinaryConnected,
       sheetsConnected,
       error,
     },

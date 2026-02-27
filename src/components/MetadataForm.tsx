@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import {
   Hash,
@@ -11,6 +11,9 @@ import {
   Send,
   Loader2,
 } from "lucide-react";
+import SearchableCombobox, {
+  type ComboboxItem,
+} from "@/components/SearchableCombobox";
 
 interface MetadataFormProps {
   ocrText: string;
@@ -58,6 +61,38 @@ export default function MetadataForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const [projectOptions, setProjectOptions] = useState<ComboboxItem[]>([]);
+  const [customSubjects, setCustomSubjects] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/options")
+      .then((res) => res.json())
+      .then((data: { projects: string[]; customSubjects: string[] }) => {
+        setProjectOptions(
+          data.projects.map((p) => ({ value: p, label: p }))
+        );
+        setCustomSubjects(data.customSubjects);
+      })
+      .catch(() => {});
+  }, []);
+
+  const subjectItems: ComboboxItem[] = useMemo(() => {
+    const defaults: ComboboxItem[] = SUBJECT_KEYS.map((key) => ({
+      value: key,
+      label: t(`subjects.${key}`),
+    }));
+    const custom: ComboboxItem[] = customSubjects.map((s) => ({
+      value: s,
+      label: s,
+    }));
+    return [...defaults, ...custom];
+  }, [customSubjects, t]);
+
+  const newItemLabel = useCallback(
+    (name: string) => t("form.newItem", { name }),
+    [t]
+  );
 
   const markTouched = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
@@ -132,14 +167,16 @@ export default function MetadataForm({
           <FolderOpen className="h-4 w-4 text-primary-500" />
           {t("form.projectName")}
         </label>
-        <input
-          type="text"
+        <SearchableCombobox
+          items={projectOptions}
           value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
+          onChange={setProjectName}
           onBlur={() => markTouched("projectName")}
-          placeholder={t("form.projectNamePlaceholder")}
-          className={inputClass("projectName", !projectName.trim())}
+          placeholder={t("form.searchProject")}
+          allowNew
+          newItemLabel={newItemLabel}
           disabled={isSubmitting}
+          hasError={!!touched.projectName && !projectName.trim()}
         />
         {touched.projectName && !projectName.trim() && (
           <p className="mt-1 text-xs text-red-500">{t("form.required")}</p>
@@ -151,20 +188,17 @@ export default function MetadataForm({
           <Tag className="h-4 w-4 text-primary-500" />
           {t("form.subject")}
         </label>
-        <select
+        <SearchableCombobox
+          items={subjectItems}
           value={subject}
-          onChange={(e) => setSubject(e.target.value)}
+          onChange={setSubject}
           onBlur={() => markTouched("subject")}
-          className={inputClass("subject", !subject)}
+          placeholder={t("form.searchSubject")}
+          allowNew
+          newItemLabel={newItemLabel}
           disabled={isSubmitting}
-        >
-          <option value="">{t("form.selectSubject")}</option>
-          {SUBJECT_KEYS.map((key) => (
-            <option key={key} value={key}>
-              {t(`subjects.${key}`)}
-            </option>
-          ))}
-        </select>
+          hasError={!!touched.subject && !subject}
+        />
         {touched.subject && !subject && (
           <p className="mt-1 text-xs text-red-500">{t("form.required")}</p>
         )}
