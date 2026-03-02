@@ -36,7 +36,6 @@ const SUGGESTED_FIELDS = [
   "amount",
   "date",
   "receiptNumber",
-  "phone",
   "businessName",
   "address",
   "taxId",

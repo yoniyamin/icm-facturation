@@ -7,6 +7,7 @@ import OcrProcessor from "@/components/OcrProcessor";
 import DataPreview from "@/components/DataPreview";
 import MetadataForm from "@/components/MetadataForm";
 import SuccessScreen from "@/components/SuccessScreen";
+import ReceiptsViewer from "@/components/ReceiptsViewer";
 
 type AppStep = "capture" | "ocr" | "preview" | "form" | "success";
 
@@ -17,6 +18,7 @@ interface ReceiptData {
   projectName: string;
   subject: string;
   amount: string;
+  currency: string;
   parsedFields: Record<string, string>;
   imageLink?: string;
   sheetLink?: string;
@@ -26,6 +28,7 @@ interface ReceiptData {
 
 export default function HomeClient() {
   const [step, setStep] = useState<AppStep>("capture");
+  const [showReceipts, setShowReceipts] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData>({
     imageDataUrl: "",
     ocrText: "",
@@ -33,6 +36,7 @@ export default function HomeClient() {
     projectName: "",
     subject: "",
     amount: "",
+    currency: "NIS",
     parsedFields: {},
   });
 
@@ -68,6 +72,7 @@ export default function HomeClient() {
       projectName: "",
       subject: "",
       amount: "",
+      currency: "NIS",
       parsedFields: {},
     });
     setStep("capture");
@@ -78,9 +83,12 @@ export default function HomeClient() {
     projectName: string;
     subject: string;
     amount: string;
+    currency: string;
   }) => {
     const updatedData = { ...receiptData, ...formData };
     setReceiptData(updatedData);
+
+    const businessName = receiptData.parsedFields?.businessName || "";
 
     const payload = {
       imageDataUrl: updatedData.imageDataUrl,
@@ -89,6 +97,8 @@ export default function HomeClient() {
       projectName: formData.projectName,
       subject: formData.subject,
       amount: formData.amount,
+      currency: formData.currency,
+      businessName,
     };
 
     try {
@@ -129,6 +139,7 @@ export default function HomeClient() {
       projectName: "",
       subject: "",
       amount: "",
+      currency: "NIS",
       parsedFields: {},
     });
     setStep("capture");
@@ -136,42 +147,48 @@ export default function HomeClient() {
 
   return (
     <div className="flex min-h-screen flex-col bg-warm-100">
-      <AppHeader />
+      <AppHeader onShowReceipts={() => setShowReceipts(true)} />
       <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-6">
-        {step === "capture" && (
-          <CameraCapture onImageCaptured={handleImageCaptured} />
-        )}
-        {step === "ocr" && (
-          <OcrProcessor
-            imageDataUrl={receiptData.imageDataUrl}
-            onComplete={handleOcrComplete}
-            onError={handleOcrError}
-          />
-        )}
-        {step === "preview" && (
-          <DataPreview
-            imageDataUrl={receiptData.imageDataUrl}
-            ocrText={receiptData.ocrText}
-            onContinue={handlePreviewContinue}
-            onRetake={handlePreviewRetake}
-          />
-        )}
-        {step === "form" && (
-          <MetadataForm
-            ocrText={receiptData.ocrText}
-            parsedFields={receiptData.parsedFields}
-            onSubmit={handleFormSubmit}
-            onBack={handleFormBack}
-          />
-        )}
-        {step === "success" && (
-          <SuccessScreen
-            imageLink={receiptData.imageLink}
-            sheetLink={receiptData.sheetLink}
-            storagePath={receiptData.storagePath}
-            resultMode={receiptData.resultMode}
-            onScanAnother={handleScanAnother}
-          />
+        {showReceipts ? (
+          <ReceiptsViewer onBack={() => setShowReceipts(false)} />
+        ) : (
+          <>
+            {step === "capture" && (
+              <CameraCapture onImageCaptured={handleImageCaptured} />
+            )}
+            {step === "ocr" && (
+              <OcrProcessor
+                imageDataUrl={receiptData.imageDataUrl}
+                onComplete={handleOcrComplete}
+                onError={handleOcrError}
+              />
+            )}
+            {step === "preview" && (
+              <DataPreview
+                imageDataUrl={receiptData.imageDataUrl}
+                ocrText={receiptData.ocrText}
+                onContinue={handlePreviewContinue}
+                onRetake={handlePreviewRetake}
+              />
+            )}
+            {step === "form" && (
+              <MetadataForm
+                ocrText={receiptData.ocrText}
+                parsedFields={receiptData.parsedFields}
+                onSubmit={handleFormSubmit}
+                onBack={handleFormBack}
+              />
+            )}
+            {step === "success" && (
+              <SuccessScreen
+                imageLink={receiptData.imageLink}
+                sheetLink={receiptData.sheetLink}
+                storagePath={receiptData.storagePath}
+                resultMode={receiptData.resultMode}
+                onScanAnother={handleScanAnother}
+              />
+            )}
+          </>
         )}
       </main>
     </div>

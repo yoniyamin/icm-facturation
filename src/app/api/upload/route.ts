@@ -15,6 +15,8 @@ interface UploadRequestBody {
   projectName: string;
   subject: string;
   amount: string;
+  currency?: string;
+  businessName?: string;
 }
 
 function isSheetsConfigured(): boolean {
@@ -91,6 +93,8 @@ export async function POST(request: NextRequest) {
         imageLink: cloudinaryResult.secureUrl,
         ocrText: body.ocrText || "",
         scannedBy,
+        currency: body.currency || "NIS",
+        businessName: body.businessName || "",
       });
 
       return NextResponse.json({

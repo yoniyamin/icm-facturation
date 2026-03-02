@@ -44,7 +44,6 @@
     "amount": "סכום",
     "date": "תאריך",
     "receiptNumber": "מספר קבלה",
-    "phone": "טלפון",
     "businessName": "שם העסק",
     "address": "כתובת",
     "taxId": "מספר עוסק / ח.פ.",
@@ -61,7 +60,7 @@
     "selectSubject": "בחר נושא",
     "amount": "סכום",
     "amountPlaceholder": "0.00",
-    "currency": "₪",
+    "selectCurrency": "מטבע",
     "submit": "שלח",
     "submitting": "שולח...",
     "back": "חזור",
@@ -102,5 +101,25 @@
     "signIn": "התחבר עם Google",
     "signOut": "התנתק",
     "notAuthorized": "כתובת האימייל שלך אינה מורשית לשימוש באפליקציה."
+  },
+  "receipts": {
+    "title": "קבלות",
+    "businessName": "שם העסק",
+    "project": "פרויקט",
+    "category": "קטגוריה",
+    "amount": "סכום",
+    "date": "תאריך",
+    "noResults": "לא נמצאו קבלות",
+    "loading": "טוען קבלות...",
+    "error": "שגיאה בטעינת קבלות",
+    "viewPhoto": "צפה",
+    "page": "עמוד",
+    "of": "מתוך",
+    "projectFilter": "סנן לפי פרויקט...",
+    "amountMin": "מינ׳",
+    "amountMax": "מקס׳",
+    "clearFilters": "נקה סינון",
+    "back": "חזרה לסורק",
+    "photo": "תמונה"
   }
 }

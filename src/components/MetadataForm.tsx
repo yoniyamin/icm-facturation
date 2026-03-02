@@ -10,10 +10,17 @@ import {
   ArrowLeft,
   Send,
   Loader2,
+  Coins,
 } from "lucide-react";
 import SearchableCombobox, {
   type ComboboxItem,
 } from "@/components/SearchableCombobox";
+
+const CURRENCIES = [
+  { value: "NIS", label: "₪ NIS", symbol: "₪" },
+  { value: "USD", label: "$ USD", symbol: "$" },
+  { value: "EUR", label: "€ EUR", symbol: "€" },
+] as const;
 
 interface MetadataFormProps {
   ocrText: string;
@@ -23,6 +30,7 @@ interface MetadataFormProps {
     projectName: string;
     subject: string;
     amount: string;
+    currency: string;
   }) => Promise<void>;
   onBack: () => void;
 }
@@ -58,6 +66,7 @@ export default function MetadataForm({
     const match = ocrText.match(/(\d+[.,]\d{2})/);
     return match ? match[1].replace(",", ".") : "";
   });
+  const [currency, setCurrency] = useState("NIS");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -120,7 +129,7 @@ export default function MetadataForm({
     setError("");
 
     try {
-      await onSubmit({ receiptNumber, projectName, subject, amount });
+      await onSubmit({ receiptNumber, projectName, subject, amount, currency });
     } catch {
       setError(t("errors.uploadFailed"));
       setIsSubmitting(false);
@@ -207,22 +216,39 @@ export default function MetadataForm({
       <div>
         <label className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700">
           <DollarSign className="h-4 w-4 text-primary-500" />
-          {t("form.amount")} ({t("form.currency")})
+          {t("form.amount")}
         </label>
-        <input
-          type="number"
-          step="0.01"
-          min="0"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          onBlur={() => markTouched("amount")}
-          placeholder={t("form.amountPlaceholder")}
-          className={inputClass(
-            "amount",
-            !amount.trim() || isNaN(parseFloat(amount))
-          )}
-          disabled={isSubmitting}
-        />
+        <div className="flex gap-2">
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            onBlur={() => markTouched("amount")}
+            placeholder={t("form.amountPlaceholder")}
+            className={`flex-1 ${inputClass(
+              "amount",
+              !amount.trim() || isNaN(parseFloat(amount))
+            )}`}
+            disabled={isSubmitting}
+          />
+          <div className="relative">
+            <Coins className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              disabled={isSubmitting}
+              className="h-full appearance-none rounded-xl border-2 border-primary-200 bg-white py-3 pe-3 ps-9 text-sm font-semibold text-gray-700 outline-none transition-colors focus:border-primary-500"
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         {touched.amount &&
           (!amount.trim() || isNaN(parseFloat(amount))) && (
             <p className="mt-1 text-xs text-red-500">{t("form.required")}</p>

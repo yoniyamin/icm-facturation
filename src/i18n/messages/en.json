@@ -44,7 +44,6 @@
     "amount": "Amount",
     "date": "Date",
     "receiptNumber": "Receipt Number",
-    "phone": "Phone",
     "businessName": "Business Name",
     "address": "Address",
     "taxId": "Tax ID",
@@ -61,7 +60,7 @@
     "selectSubject": "Select subject",
     "amount": "Amount",
     "amountPlaceholder": "0.00",
-    "currency": "₪",
+    "selectCurrency": "Currency",
     "submit": "Submit",
     "submitting": "Submitting...",
     "back": "Back",
@@ -102,5 +101,25 @@
     "signIn": "Sign in with Google",
     "signOut": "Sign out",
     "notAuthorized": "Your email is not authorized to use this app."
+  },
+  "receipts": {
+    "title": "Receipts",
+    "businessName": "Business Name",
+    "project": "Project",
+    "category": "Category",
+    "amount": "Amount",
+    "date": "Date",
+    "noResults": "No receipts found",
+    "loading": "Loading receipts...",
+    "error": "Failed to load receipts",
+    "viewPhoto": "View",
+    "page": "Page",
+    "of": "of",
+    "projectFilter": "Filter by project...",
+    "amountMin": "Min",
+    "amountMax": "Max",
+    "clearFilters": "Clear filters",
+    "back": "Back to scanner",
+    "photo": "Photo"
   }
 }

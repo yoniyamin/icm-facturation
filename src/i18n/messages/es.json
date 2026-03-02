@@ -44,7 +44,6 @@
     "amount": "Monto",
     "date": "Fecha",
     "receiptNumber": "Número de Recibo",
-    "phone": "Teléfono",
     "businessName": "Nombre del Negocio",
     "address": "Dirección",
     "taxId": "NIF / CIF",
@@ -61,7 +60,7 @@
     "selectSubject": "Selecciona un tema",
     "amount": "Monto",
     "amountPlaceholder": "0.00",
-    "currency": "₪",
+    "selectCurrency": "Moneda",
     "submit": "Enviar",
     "submitting": "Enviando...",
     "back": "Volver",
@@ -102,5 +101,25 @@
     "signIn": "Iniciar sesion con Google",
     "signOut": "Cerrar sesion",
     "notAuthorized": "Tu correo no esta autorizado para usar esta aplicacion."
+  },
+  "receipts": {
+    "title": "Recibos",
+    "businessName": "Nombre del Negocio",
+    "project": "Proyecto",
+    "category": "Categoría",
+    "amount": "Monto",
+    "date": "Fecha",
+    "noResults": "No se encontraron recibos",
+    "loading": "Cargando recibos...",
+    "error": "Error al cargar recibos",
+    "viewPhoto": "Ver",
+    "page": "Página",
+    "of": "de",
+    "projectFilter": "Filtrar por proyecto...",
+    "amountMin": "Mín",
+    "amountMax": "Máx",
+    "clearFilters": "Limpiar filtros",
+    "back": "Volver al escáner",
+    "photo": "Foto"
   }
 }
