@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 100% 98%;
+    --foreground: 215 50% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 50% 16%;
+    --primary: 211 62% 57%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 100% 95%;
+    --secondary-foreground: 215 50% 16%;
+    --accent: 40 76% 55%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 40 50% 96%;
+    --muted-foreground: 215 16% 47%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 30% 90%;
+    --ring: 211 62% 57%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .border-border {
+    border-color: hsl(var(--border));
+  }
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+  .text-foreground {
+    color: hsl(var(--foreground));
+  }
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overscroll-behavior: none;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px !important;
+}
