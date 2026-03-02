@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+import { sheets_v4, auth as gauth } from "@googleapis/sheets";
 
 export function getGoogleAuth() {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -10,15 +10,13 @@ export function getGoogleAuth() {
     );
   }
 
-  const auth = new google.auth.JWT({
+  return new gauth.JWT({
     email,
     key: privateKey,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
-
-  return auth;
 }
 
 export function getSheetsClient() {
-  return google.sheets({ version: "v4", auth: getGoogleAuth() });
+  return new sheets_v4.Sheets({ auth: getGoogleAuth() });
 }
