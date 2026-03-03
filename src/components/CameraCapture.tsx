@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Camera, Upload, Image as ImageIcon } from "lucide-react";
+import { Camera, Upload, Image as ImageIcon, ScanLine } from "lucide-react";
 import logoImg from "@/static/logo.png";
 
 interface CameraCaptureProps {
@@ -128,14 +128,14 @@ export default function CameraCapture({ onImageCaptured }: CameraCaptureProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6">
       <div className="text-center">
-        <div className="relative mx-auto mb-4 w-48">
+        <div className="relative mx-auto mb-6 w-48">
           <img
             src={logoImg.src}
             alt="ICM Logo"
-            className="w-full"
+            className="w-full rounded-2xl border border-gray-200 shadow-sm"
           />
-          <div className="absolute -bottom-3 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full bg-primary-100 shadow-md ring-2 ring-white">
-            <Camera className="h-6 w-6 text-primary-500" />
+          <div className="absolute -bottom-5 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full bg-primary-100 shadow-md ring-2 ring-white">
+            <ScanLine className="h-6 w-6 text-primary-500" />
           </div>
         </div>
         <h2 className="mt-4 text-xl font-bold text-primary-900">
