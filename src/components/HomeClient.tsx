@@ -148,7 +148,11 @@ export default function HomeClient() {
   return (
     <div className="flex min-h-screen flex-col bg-warm-100">
       <AppHeader onShowReceipts={() => setShowReceipts(true)} />
-      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-6">
+      <main
+        className={`mx-auto flex w-full flex-1 flex-col px-4 py-6 ${
+          showReceipts ? "max-w-4xl" : "max-w-lg"
+        }`}
+      >
         {showReceipts ? (
           <ReceiptsViewer onBack={() => setShowReceipts(false)} />
         ) : (

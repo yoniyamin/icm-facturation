@@ -10,6 +10,9 @@ import {
   Loader2,
   X,
   Search,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 
 interface Receipt {
@@ -27,7 +30,7 @@ interface ReceiptsViewerProps {
   onBack: () => void;
 }
 
-const PAGE_SIZE = 10;
+const PAGE_OPTIONS = [5, 10, 20, 50, 0] as const;
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   USD: "$",
@@ -35,16 +38,28 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   NIS: "₪",
 };
 
+type SortKey = "businessName" | "projectName" | "subject" | "amount" | "date";
+type SortDir = "asc" | "desc";
+
+function parseDate(d: string): number {
+  const parts = d.split("/");
+  if (parts.length === 3) {
+    return new Date(+parts[2], +parts[1] - 1, +parts[0]).getTime();
+  }
+  return new Date(d).getTime() || 0;
+}
+
 export default function ReceiptsViewer({ onBack }: ReceiptsViewerProps) {
   const t = useTranslations();
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [projectFilter, setProjectFilter] = useState("");
-  const [amountMin, setAmountMin] = useState("");
-  const [amountMax, setAmountMax] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   useEffect(() => {
     fetch("/api/receipts")
@@ -63,37 +78,67 @@ export default function ReceiptsViewer({ onBack }: ReceiptsViewerProps) {
   }, [t]);
 
   const filtered = useMemo(() => {
-    return receipts.filter((r) => {
-      if (
-        projectFilter &&
-        !r.projectName.toLowerCase().includes(projectFilter.toLowerCase())
-      )
-        return false;
-      const amt = parseFloat(r.amount);
-      if (amountMin && !isNaN(parseFloat(amountMin)) && amt < parseFloat(amountMin))
-        return false;
-      if (amountMax && !isNaN(parseFloat(amountMax)) && amt > parseFloat(amountMax))
-        return false;
-      return true;
+    let result = receipts;
+    if (projectFilter) {
+      result = result.filter((r) =>
+        r.projectName.toLowerCase().includes(projectFilter.toLowerCase())
+      );
+    }
+    return result;
+  }, [receipts, projectFilter]);
+
+  const sorted = useMemo(() => {
+    if (!sortKey) return filtered;
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === "amount") {
+        cmp = parseFloat(a.amount || "0") - parseFloat(b.amount || "0");
+      } else if (sortKey === "date") {
+        cmp = parseDate(a.date) - parseDate(b.date);
+      } else {
+        cmp = (a[sortKey] || "").localeCompare(b[sortKey] || "");
+      }
+      return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [receipts, projectFilter, amountMin, amountMax]);
+  }, [filtered, sortKey, sortDir]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages =
+    pageSize === 0 ? 1 : Math.max(1, Math.ceil(sorted.length / pageSize));
   const safeP = Math.min(page, totalPages);
-  const paged = filtered.slice((safeP - 1) * PAGE_SIZE, safeP * PAGE_SIZE);
+  const paged =
+    pageSize === 0
+      ? sorted
+      : sorted.slice((safeP - 1) * pageSize, safeP * pageSize);
 
-  const hasFilters = projectFilter || amountMin || amountMax;
+  const hasFilters = !!projectFilter;
 
   const clearFilters = () => {
     setProjectFilter("");
-    setAmountMin("");
-    setAmountMax("");
     setPage(1);
   };
 
   useEffect(() => {
     setPage(1);
-  }, [projectFilter, amountMin, amountMax]);
+  }, [projectFilter, pageSize]);
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const SortIcon = ({ col }: { col: SortKey }) => {
+    if (sortKey !== col)
+      return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    return sortDir === "asc" ? (
+      <ArrowUp className="h-3 w-3" />
+    ) : (
+      <ArrowDown className="h-3 w-3" />
+    );
+  };
 
   if (loading) {
     return (
@@ -120,7 +165,7 @@ export default function ReceiptsViewer({ onBack }: ReceiptsViewerProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4">
+    <div className="flex flex-1 flex-col gap-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-primary-900">
@@ -135,58 +180,40 @@ export default function ReceiptsViewer({ onBack }: ReceiptsViewerProps) {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="rounded-xl border border-primary-200 bg-white p-3">
-        <div className="flex flex-wrap items-end gap-2">
-          <div className="flex-1 min-w-[140px]">
-            <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-              {t("receipts.project")}
-            </label>
-            <div className="relative">
-              <Search className="pointer-events-none absolute start-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                value={projectFilter}
-                onChange={(e) => setProjectFilter(e.target.value)}
-                placeholder={t("receipts.projectFilter")}
-                className="w-full rounded-lg border border-gray-200 bg-warm-50 py-1.5 pe-3 ps-8 text-xs outline-none transition-colors focus:border-primary-400 focus:bg-white"
-              />
-            </div>
-          </div>
-          <div className="w-20">
-            <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-              {t("receipts.amountMin")}
-            </label>
+      {/* Filters row */}
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="min-w-[160px] flex-1">
+          <div className="relative">
+            <Search className="pointer-events-none absolute start-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
             <input
-              type="number"
-              value={amountMin}
-              onChange={(e) => setAmountMin(e.target.value)}
-              placeholder="0"
-              className="w-full rounded-lg border border-gray-200 bg-warm-50 px-2.5 py-1.5 text-xs outline-none transition-colors focus:border-primary-400 focus:bg-white"
+              type="text"
+              value={projectFilter}
+              onChange={(e) => setProjectFilter(e.target.value)}
+              placeholder={t("receipts.projectFilter")}
+              className="w-full rounded-lg border border-gray-200 bg-white py-1.5 pe-3 ps-8 text-xs outline-none transition-colors focus:border-primary-400"
             />
           </div>
-          <div className="w-20">
-            <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-              {t("receipts.amountMax")}
-            </label>
-            <input
-              type="number"
-              value={amountMax}
-              onChange={(e) => setAmountMax(e.target.value)}
-              placeholder="999"
-              className="w-full rounded-lg border border-gray-200 bg-warm-50 px-2.5 py-1.5 text-xs outline-none transition-colors focus:border-primary-400 focus:bg-white"
-            />
-          </div>
-          {hasFilters && (
-            <button
-              onClick={clearFilters}
-              className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100"
-            >
-              <X className="h-3 w-3" />
-              {t("receipts.clearFilters")}
-            </button>
-          )}
         </div>
+        <select
+          value={pageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs text-gray-700 outline-none focus:border-primary-400"
+        >
+          {PAGE_OPTIONS.map((n) => (
+            <option key={n} value={n}>
+              {n === 0 ? t("receipts.all") || "All" : `${n} / ${t("receipts.page").toLowerCase()}`}
+            </option>
+          ))}
+        </select>
+        {hasFilters && (
+          <button
+            onClick={clearFilters}
+            className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100"
+          >
+            <X className="h-3 w-3" />
+            {t("receipts.clearFilters")}
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -195,24 +222,54 @@ export default function ReceiptsViewer({ onBack }: ReceiptsViewerProps) {
           <p className="text-sm text-gray-500">{t("receipts.noResults")}</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-primary-200">
-          <table className="w-full min-w-[500px] text-sm">
-            <thead>
+        <div className="flex-1 overflow-auto rounded-xl border border-primary-200">
+          <table className="w-full min-w-[520px] text-sm">
+            <thead className="sticky top-0 z-10">
               <tr className="border-b border-primary-200 bg-primary-50">
-                <th className="px-3 py-2 text-start text-xs font-semibold text-primary-700">
-                  {t("receipts.businessName")}
+                <th
+                  onClick={() => handleSort("businessName")}
+                  className="cursor-pointer px-3 py-2 text-start text-xs font-semibold text-primary-700 select-none hover:bg-primary-100"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {t("receipts.businessName")}
+                    <SortIcon col="businessName" />
+                  </span>
                 </th>
-                <th className="px-3 py-2 text-start text-xs font-semibold text-primary-700">
-                  {t("receipts.project")}
+                <th
+                  onClick={() => handleSort("projectName")}
+                  className="cursor-pointer px-3 py-2 text-start text-xs font-semibold text-primary-700 select-none hover:bg-primary-100"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {t("receipts.project")}
+                    <SortIcon col="projectName" />
+                  </span>
                 </th>
-                <th className="px-3 py-2 text-start text-xs font-semibold text-primary-700">
-                  {t("receipts.category")}
+                <th
+                  onClick={() => handleSort("subject")}
+                  className="cursor-pointer px-3 py-2 text-start text-xs font-semibold text-primary-700 select-none hover:bg-primary-100"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {t("receipts.category")}
+                    <SortIcon col="subject" />
+                  </span>
                 </th>
-                <th className="px-3 py-2 text-end text-xs font-semibold text-primary-700">
-                  {t("receipts.amount")}
+                <th
+                  onClick={() => handleSort("amount")}
+                  className="cursor-pointer px-3 py-2 text-end text-xs font-semibold text-primary-700 select-none hover:bg-primary-100"
+                >
+                  <span className="inline-flex items-center justify-end gap-1">
+                    {t("receipts.amount")}
+                    <SortIcon col="amount" />
+                  </span>
                 </th>
-                <th className="px-3 py-2 text-start text-xs font-semibold text-primary-700">
-                  {t("receipts.date")}
+                <th
+                  onClick={() => handleSort("date")}
+                  className="cursor-pointer px-3 py-2 text-start text-xs font-semibold text-primary-700 select-none hover:bg-primary-100"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {t("receipts.date")}
+                    <SortIcon col="date" />
+                  </span>
                 </th>
                 <th className="px-3 py-2 text-center text-xs font-semibold text-primary-700">
                   {t("receipts.photo")}
@@ -225,18 +282,17 @@ export default function ReceiptsViewer({ onBack }: ReceiptsViewerProps) {
                   key={i}
                   className="border-b border-gray-100 bg-white transition-colors hover:bg-warm-50"
                 >
-                  <td className="max-w-[120px] truncate px-3 py-2 text-gray-800">
+                  <td className="max-w-[140px] truncate px-3 py-2 text-gray-800">
                     {r.businessName || "—"}
                   </td>
-                  <td className="max-w-[120px] truncate px-3 py-2 text-gray-800">
+                  <td className="max-w-[140px] truncate px-3 py-2 text-gray-800">
                     {r.projectName}
                   </td>
-                  <td className="max-w-[100px] truncate px-3 py-2 text-gray-600">
+                  <td className="max-w-[120px] truncate px-3 py-2 text-gray-600">
                     {r.subject}
                   </td>
                   <td className="whitespace-nowrap px-3 py-2 text-end font-medium text-gray-800">
-                    {CURRENCY_SYMBOLS[r.currency] || r.currency}{" "}
-                    {r.amount}
+                    {CURRENCY_SYMBOLS[r.currency] || r.currency} {r.amount}
                   </td>
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">
                     {r.date}
@@ -264,8 +320,8 @@ export default function ReceiptsViewer({ onBack }: ReceiptsViewerProps) {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3">
+      {pageSize > 0 && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 py-1">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safeP <= 1}

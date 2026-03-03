@@ -5,9 +5,9 @@ import { locales, type Locale } from "@/i18n/config";
 import { useLocale } from "next-intl";
 
 const localeLabels: Record<string, string> = {
-  he: "HE",
-  es: "ES",
-  en: "EN",
+  he: "עברית",
+  es: "Español",
+  en: "English",
 };
 
 export default function LanguageSwitcher() {
@@ -20,15 +20,15 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex rounded-lg bg-white/20 p-0.5">
+    <div className="flex gap-1">
       {locales.map((locale) => (
         <button
           key={locale}
           onClick={() => handleLocaleChange(locale)}
-          className={`rounded-md px-1.5 py-1 text-[10px] font-bold transition-all ${
+          className={`rounded-md px-2 py-1 text-xs font-medium transition-all ${
             currentLocale === locale
-              ? "bg-white text-primary-700 shadow-sm"
-              : "text-white/80 hover:text-white"
+              ? "bg-primary-100 text-primary-700 shadow-sm"
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
           }`}
         >
           {localeLabels[locale] || locale.toUpperCase()}

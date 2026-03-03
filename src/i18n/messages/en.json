@@ -120,6 +120,7 @@
     "amountMax": "Max",
     "clearFilters": "Clear filters",
     "back": "Back to scanner",
-    "photo": "Photo"
+    "photo": "Photo",
+    "all": "All"
   }
 }
