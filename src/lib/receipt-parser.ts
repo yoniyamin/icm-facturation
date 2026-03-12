@@ -3,6 +3,7 @@ export interface ParsedField {
   label: string;
   value: string;
   confidence: "high" | "medium" | "low";
+  candidates?: string[];
 }
 
 export interface ParsedReceipt {
@@ -12,9 +13,9 @@ export interface ParsedReceipt {
 }
 
 const AMOUNT_PATTERNS = [
-  /(?:total|סה"כ|סהכ|סה״כ|סכום|total|importe|monto)\s*:?\s*[₪$€]?\s*(\d+[.,]\d{2})/i,
+  /(?:total|סה"כ|סהכ|סה״כ|סכום|importe|monto)\s*:?\s*\(?[₪$€]?\)?\s*(\d+[.,]\d{2})/i,
   /[₪$€]\s*(\d+[.,]\d{2})/,
-  /(\d+[.,]\d{2})\s*[₪$€]/,
+  /(\d+[.,]\d{2})\s*[₪$€](?![\/\w])/,
   /(?:total|סה"כ|סהכ)\s*(\d+[.,]\d{2})/i,
 ];
 
@@ -58,14 +59,51 @@ function extractField(
   return null;
 }
 
+function extractAmountCandidates(
+  text: string
+): { value: string; confidence: ParsedField["confidence"] }[] {
+  const candidates: { value: string; confidence: ParsedField["confidence"] }[] =
+    [];
+  const seen = new Set<string>();
+
+  for (let i = 0; i < AMOUNT_PATTERNS.length; i++) {
+    const src = AMOUNT_PATTERNS[i].source;
+    const baseFlags = AMOUNT_PATTERNS[i].flags.replace("g", "");
+    const globalPattern = new RegExp(src, baseFlags + "g");
+    const confidence: ParsedField["confidence"] = i === 0 ? "high" : "medium";
+
+    for (const match of text.matchAll(globalPattern)) {
+      if (match[1]) {
+        const val = match[1].trim();
+        if (!seen.has(val)) {
+          seen.add(val);
+          candidates.push({ value: val, confidence });
+        }
+      }
+    }
+  }
+
+  return candidates;
+}
+
 export function parseReceiptText(rawText: string): ParsedReceipt {
   const fields: ParsedField[] = [];
   let remainingText = rawText;
 
-  const amount = extractField(rawText, AMOUNT_PATTERNS, "amount", "amount");
-  if (amount) {
-    fields.push(amount);
-    remainingText = remainingText.replace(amount.value, "").trim();
+  const amountCandidates = extractAmountCandidates(rawText);
+  if (amountCandidates.length > 0) {
+    const best = amountCandidates[0];
+    const amountField: ParsedField = {
+      key: "amount",
+      label: "amount",
+      value: best.value,
+      confidence: best.confidence,
+    };
+    if (amountCandidates.length > 1) {
+      amountField.candidates = amountCandidates.map((c) => c.value);
+    }
+    fields.push(amountField);
+    remainingText = remainingText.replace(best.value, "").trim();
   }
 
   const date = extractField(rawText, DATE_PATTERNS, "date", "date");

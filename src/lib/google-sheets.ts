@@ -53,7 +53,7 @@ export async function appendToSheet(entry: SheetEntry): Promise<string> {
           entry.imageLink,
           truncatedOcrText,
           entry.scannedBy,
-          entry.currency || "NIS",
+          entry.currency || "EUR",
           entry.businessName || "",
         ],
       ],
@@ -84,7 +84,7 @@ export async function getReceipts(): Promise<ReceiptRow[]> {
       amount: row[4] || "",
       imageLink: row[5] || "",
       scannedBy: row[7] || "",
-      currency: row[8] || "NIS",
+      currency: row[8] || "EUR",
       businessName: row[9] || "",
     }))
     .reverse();

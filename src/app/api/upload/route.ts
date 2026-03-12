@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         imageLink: cloudinaryResult.secureUrl,
         ocrText: body.ocrText || "",
         scannedBy,
-        currency: body.currency || "NIS",
+        currency: body.currency || "EUR",
         businessName: body.businessName || "",
       });
 

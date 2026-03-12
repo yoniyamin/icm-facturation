@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   FileText,
@@ -18,6 +18,7 @@ import {
   ZoomIn,
   ZoomOut,
   Tag,
+  ListChecks,
 } from "lucide-react";
 import {
   parseReceiptText,
@@ -190,6 +191,60 @@ function FieldAssignPopup({
   );
 }
 
+function AmountPickerModal({
+  candidates,
+  currentValue,
+  onSelect,
+  onClose,
+  t,
+}: {
+  candidates: string[];
+  currentValue: string;
+  onSelect: (value: string) => void;
+  onClose: () => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
+        <div className="mb-1 flex items-center gap-2 text-accent-500">
+          <ListChecks className="h-5 w-5" />
+          <h3 className="text-base font-bold text-gray-800">
+            {t("preview.amountPicker.title")}
+          </h3>
+        </div>
+        <p className="mb-4 text-sm text-gray-500">
+          {t("preview.amountPicker.subtitle")}
+        </p>
+        <div className="space-y-2">
+          {candidates.map((candidate) => (
+            <button
+              key={candidate}
+              onClick={() => {
+                onSelect(candidate);
+                onClose();
+              }}
+              className={`w-full rounded-xl border-2 px-4 py-3 text-center text-lg font-semibold transition-colors ${
+                candidate === currentValue
+                  ? "border-accent-400 bg-accent-50 text-accent-700"
+                  : "border-gray-200 bg-gray-50 text-gray-700 hover:border-primary-300 hover:bg-primary-50"
+              }`}
+            >
+              {candidate}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onClose}
+          className="mt-4 w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+        >
+          {t("preview.amountPicker.close")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function DataPreview({
   imageDataUrl,
   ocrText,
@@ -217,7 +272,17 @@ export default function DataPreview({
   const [showRawText, setShowRawText] = useState(true);
   const [imageExpanded, setImageExpanded] = useState(false);
   const [selectedText, setSelectedText] = useState<string | null>(null);
+  const [showAmountPicker, setShowAmountPicker] = useState(false);
   const textAreaRef = useRef<HTMLDivElement>(null);
+
+  const amountField = parsed.fields.find((f) => f.key === "amount");
+  const amountCandidates = amountField?.candidates;
+
+  useEffect(() => {
+    if (amountCandidates && amountCandidates.length > 1) {
+      setShowAmountPicker(true);
+    }
+  }, [amountCandidates]);
 
   const allFields = [...parsed.fields, ...customFields];
 
@@ -355,6 +420,10 @@ export default function DataPreview({
               )?.value;
               const isEdited =
                 !isCustom && editedValues[field.key] !== originalValue;
+              const hasCandidates =
+                field.key === "amount" &&
+                amountCandidates &&
+                amountCandidates.length > 1;
 
               return (
                 <div
@@ -390,6 +459,15 @@ export default function DataPreview({
                         className="rounded-full bg-red-100 p-0.5 text-red-500 hover:bg-red-200"
                       >
                         <X className="h-3 w-3" />
+                      </button>
+                    )}
+                    {hasCandidates && (
+                      <button
+                        onClick={() => setShowAmountPicker(true)}
+                        className="inline-flex items-center gap-1 rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-medium text-accent-700 hover:bg-accent-200 transition-colors"
+                      >
+                        <ListChecks className="h-2.5 w-2.5" />
+                        {t("preview.amountPicker.pickAmount")}
                       </button>
                     )}
                   </div>
@@ -484,6 +562,16 @@ export default function DataPreview({
           {t("preview.continue")}
         </button>
       </div>
+
+      {showAmountPicker && amountCandidates && amountCandidates.length > 1 && (
+        <AmountPickerModal
+          candidates={amountCandidates}
+          currentValue={editedValues["amount"] || ""}
+          onSelect={(value) => handleFieldChange("amount", value)}
+          onClose={() => setShowAmountPicker(false)}
+          t={t}
+        />
+      )}
     </div>
   );
 }

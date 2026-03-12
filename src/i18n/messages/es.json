@@ -38,6 +38,12 @@
       "high": "Alta confianza",
       "medium": "Confianza media",
       "low": "Baja confianza"
+    },
+    "amountPicker": {
+      "title": "Múltiples montos detectados",
+      "subtitle": "Selecciona el monto total correcto",
+      "close": "Mantener actual",
+      "pickAmount": "Cambiar"
     }
   },
   "fields": {

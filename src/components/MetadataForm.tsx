@@ -66,7 +66,7 @@ export default function MetadataForm({
     const match = ocrText.match(/(\d+[.,]\d{2})/);
     return match ? match[1].replace(",", ".") : "";
   });
-  const [currency, setCurrency] = useState("NIS");
+  const [currency, setCurrency] = useState("EUR");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});

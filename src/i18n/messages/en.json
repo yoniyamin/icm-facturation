@@ -38,6 +38,12 @@
       "high": "High confidence",
       "medium": "Medium confidence",
       "low": "Low confidence"
+    },
+    "amountPicker": {
+      "title": "Multiple amounts detected",
+      "subtitle": "Select the correct total amount",
+      "close": "Keep current",
+      "pickAmount": "Change"
     }
   },
   "fields": {

@@ -36,7 +36,7 @@ export default function HomeClient() {
     projectName: "",
     subject: "",
     amount: "",
-    currency: "NIS",
+    currency: "EUR",
     parsedFields: {},
   });
 
@@ -72,7 +72,7 @@ export default function HomeClient() {
       projectName: "",
       subject: "",
       amount: "",
-      currency: "NIS",
+      currency: "EUR",
       parsedFields: {},
     });
     setStep("capture");
@@ -139,7 +139,7 @@ export default function HomeClient() {
       projectName: "",
       subject: "",
       amount: "",
-      currency: "NIS",
+      currency: "EUR",
       parsedFields: {},
     });
     setStep("capture");
