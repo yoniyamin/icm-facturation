@@ -72,7 +72,8 @@ function extractAmountCandidates(
     const globalPattern = new RegExp(src, baseFlags + "g");
     const confidence: ParsedField["confidence"] = i === 0 ? "high" : "medium";
 
-    for (const match of text.matchAll(globalPattern)) {
+    let match: RegExpExecArray | null;
+    while ((match = globalPattern.exec(text)) !== null) {
       if (match[1]) {
         const val = match[1].trim();
         if (!seen.has(val)) {
