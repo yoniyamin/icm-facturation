@@ -38,6 +38,7 @@ export default function AppHeader({ onShowReceipts }: AppHeaderProps) {
   }, [menuOpen]);
 
   return (
+    <>
     <header className="sticky top-0 z-50 border-b border-primary-200 bg-primary-500/95 backdrop-blur-sm">
       <div className="mx-auto flex items-center justify-between gap-2 px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex min-w-0 items-center gap-2">
@@ -115,7 +116,8 @@ export default function AppHeader({ onShowReceipts }: AppHeaderProps) {
           </div>
         </div>
       </div>
-      {usersOpen && <AllowedUsersModal onClose={() => setUsersOpen(false)} />}
     </header>
+    {usersOpen && <AllowedUsersModal onClose={() => setUsersOpen(false)} />}
+    </>
   );
 }
