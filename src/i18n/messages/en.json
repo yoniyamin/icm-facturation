@@ -143,5 +143,10 @@
     "loadError": "Failed to load users",
     "saveError": "Failed to save",
     "confirmRemove": "Remove {email} from the allowed list?"
+  },
+  "guide": {
+    "title": "User Guide",
+    "close": "Close",
+    "loadError": "Failed to load the user guide"
   }
 }

@@ -5,7 +5,8 @@ import { useTranslations } from "next-intl";
 import { signOut, useSession } from "next-auth/react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import AllowedUsersModal from "./AllowedUsersModal";
-import { Receipt, LogOut, List, Menu, X, Users } from "lucide-react";
+import UserGuideModal from "./UserGuideModal";
+import { Receipt, LogOut, List, Menu, X, Users, HelpCircle } from "lucide-react";
 import ConnectionStatus from "./ConnectionStatus";
 
 interface AppHeaderProps {
@@ -17,6 +18,7 @@ export default function AppHeader({ onShowReceipts }: AppHeaderProps) {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const userName =
@@ -96,6 +98,16 @@ export default function AppHeader({ onShowReceipts }: AppHeaderProps) {
                     {t("users.title")}
                   </button>
                 )}
+                <button
+                  onClick={() => {
+                    setGuideOpen(true);
+                    setMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 border-t border-gray-100 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-primary-50"
+                >
+                  <HelpCircle className="h-4 w-4 text-primary-500" />
+                  {t("guide.title")}
+                </button>
                 <div className="border-t border-gray-100 px-4 py-3">
                   <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                     {t("language.select")}
@@ -118,6 +130,7 @@ export default function AppHeader({ onShowReceipts }: AppHeaderProps) {
       </div>
     </header>
     {usersOpen && <AllowedUsersModal onClose={() => setUsersOpen(false)} />}
+    {guideOpen && <UserGuideModal onClose={() => setGuideOpen(false)} />}
     </>
   );
 }

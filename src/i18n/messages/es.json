@@ -143,5 +143,10 @@
     "loadError": "Error al cargar usuarios",
     "saveError": "Error al guardar",
     "confirmRemove": "¿Eliminar a {email} de la lista permitida?"
+  },
+  "guide": {
+    "title": "Guía de usuario",
+    "close": "Cerrar",
+    "loadError": "Error al cargar la guía de usuario"
   }
 }
