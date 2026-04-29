@@ -128,5 +128,20 @@
     "back": "Volver al escáner",
     "photo": "Foto",
     "all": "Todos"
+  },
+  "users": {
+    "title": "Gestionar usuarios",
+    "emailPlaceholder": "Correo electrónico",
+    "makeAdmin": "Otorgar acceso de administrador",
+    "add": "Agregar usuario",
+    "remove": "Eliminar",
+    "close": "Cerrar",
+    "admin": "Administrador",
+    "user": "Usuario",
+    "seedAdmin": "Administrador integrado (env)",
+    "empty": "Aún no hay usuarios adicionales",
+    "loadError": "Error al cargar usuarios",
+    "saveError": "Error al guardar",
+    "confirmRemove": "¿Eliminar a {email} de la lista permitida?"
   }
 }

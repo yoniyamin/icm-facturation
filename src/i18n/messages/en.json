@@ -128,5 +128,20 @@
     "back": "Back to scanner",
     "photo": "Photo",
     "all": "All"
+  },
+  "users": {
+    "title": "Manage Users",
+    "emailPlaceholder": "Email address",
+    "makeAdmin": "Grant admin access",
+    "add": "Add user",
+    "remove": "Remove",
+    "close": "Close",
+    "admin": "Admin",
+    "user": "User",
+    "seedAdmin": "Built-in admin (env)",
+    "empty": "No additional users yet",
+    "loadError": "Failed to load users",
+    "saveError": "Failed to save",
+    "confirmRemove": "Remove {email} from the allowed list?"
   }
 }
