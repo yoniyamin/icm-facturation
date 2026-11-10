@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { recognizeText, localeToOcrLang, type OcrProgress } from "@/lib/ocr";
+import { recognizeStructured, localeToOcrLang, type OcrProgress, type OcrResult, type OcrLanguage } from "@/lib/ocr";
+import { preprocessImage } from "@/lib/image-preprocess";
 import { ScanLine, AlertCircle } from "lucide-react";
 
 interface OcrProcessorProps {
   imageDataUrl: string;
-  onComplete: (text: string) => void;
+  onComplete: (text: string, structuredResult?: OcrResult) => void;
   onError: () => void;
 }
 
@@ -25,22 +26,51 @@ export default function OcrProcessor({
   const [error, setError] = useState(false);
   const hasStarted = useRef(false);
 
+  const fallbackToTesseract = useCallback(
+    (lang: OcrLanguage) => {
+      setProgress({ status: "loading", progress: 0 });
+      preprocessImage(imageDataUrl)
+        .then((processedImage) =>
+          recognizeStructured(processedImage, lang, (p) => {
+            setProgress(p);
+          })
+        )
+        .then((result) => {
+          onComplete(result.text, result);
+        })
+        .catch(() => {
+          setError(true);
+        });
+    },
+    [imageDataUrl, onComplete]
+  );
+
   useEffect(() => {
     if (hasStarted.current) return;
     hasStarted.current = true;
 
     const lang = localeToOcrLang[locale] || "eng";
 
-    recognizeText(imageDataUrl, lang, (p) => {
-      setProgress(p);
+    setProgress({ status: "recognizing text", progress: 0.1 });
+
+    fetch("/api/ocr", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageDataUrl, language: locale }),
     })
-      .then((text) => {
-        onComplete(text);
+      .then(async (res) => {
+        if (!res.ok) throw new Error("fallback");
+        const data = await res.json();
+        if (!data.success || !data.result) throw new Error("fallback");
+        return data.result as OcrResult;
+      })
+      .then((result) => {
+        onComplete(result.text, result);
       })
       .catch(() => {
-        setError(true);
+        fallbackToTesseract(lang);
       });
-  }, [imageDataUrl, locale, onComplete]);
+  }, [imageDataUrl, locale, onComplete, fallbackToTesseract]);
 
   if (error) {
     return (

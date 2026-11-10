@@ -25,10 +25,13 @@ import {
   type ParsedField,
   type ParsedReceipt,
 } from "@/lib/receipt-parser";
+import { parseReceiptSpatial } from "@/lib/receipt-parser-spatial";
+import type { OcrResult } from "@/lib/ocr";
 
 interface DataPreviewProps {
   imageDataUrl: string;
   ocrText: string;
+  ocrResult?: OcrResult;
   onContinue: (editedFields: Record<string, string>) => void;
   onRetake: () => void;
 }
@@ -248,14 +251,15 @@ function AmountPickerModal({
 export default function DataPreview({
   imageDataUrl,
   ocrText,
+  ocrResult,
   onContinue,
   onRetake,
 }: DataPreviewProps) {
   const t = useTranslations();
 
   const parsed: ParsedReceipt = useMemo(
-    () => parseReceiptText(ocrText),
-    [ocrText]
+    () => (ocrResult ? parseReceiptSpatial(ocrResult) : parseReceiptText(ocrText)),
+    [ocrText, ocrResult]
   );
 
   const [editedValues, setEditedValues] = useState<Record<string, string>>(

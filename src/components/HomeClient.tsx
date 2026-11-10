@@ -8,12 +8,14 @@ import DataPreview from "@/components/DataPreview";
 import MetadataForm from "@/components/MetadataForm";
 import SuccessScreen from "@/components/SuccessScreen";
 import ReceiptsViewer from "@/components/ReceiptsViewer";
+import type { OcrResult } from "@/lib/ocr";
 
 type AppStep = "capture" | "ocr" | "preview" | "form" | "success";
 
 interface ReceiptData {
   imageDataUrl: string;
   ocrText: string;
+  ocrResult?: OcrResult;
   receiptNumber: string;
   projectName: string;
   subject: string;
@@ -45,8 +47,8 @@ export default function HomeClient() {
     setStep("ocr");
   };
 
-  const handleOcrComplete = (text: string) => {
-    setReceiptData((prev) => ({ ...prev, ocrText: text }));
+  const handleOcrComplete = (text: string, structuredResult?: OcrResult) => {
+    setReceiptData((prev) => ({ ...prev, ocrText: text, ocrResult: structuredResult }));
     setStep("preview");
   };
 
@@ -171,6 +173,7 @@ export default function HomeClient() {
               <DataPreview
                 imageDataUrl={receiptData.imageDataUrl}
                 ocrText={receiptData.ocrText}
+                ocrResult={receiptData.ocrResult}
                 onContinue={handlePreviewContinue}
                 onRetake={handlePreviewRetake}
               />
