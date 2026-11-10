@@ -28,6 +28,16 @@ export function isVisionConfigured(): boolean {
   );
 }
 
+/**
+ * Verify the service account can obtain a Vision-scoped access token.
+ * Does NOT call the Vision API itself — costs zero quota.
+ */
+export async function pingVisionAuth(): Promise<boolean> {
+  const auth = getVisionAuth();
+  const credentials = await auth.authorize();
+  return !!credentials.access_token;
+}
+
 interface VisionVertex {
   x?: number;
   y?: number;

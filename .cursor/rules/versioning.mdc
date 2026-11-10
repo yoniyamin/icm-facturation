@@ -1,0 +1,32 @@
+---
+description: Version management — bump version.json on every commit
+globs: 
+alwaysApply: true
+---
+
+# Version Management
+
+The app version is stored in `version.json` at the project root:
+
+```json
+{ "version": "MAJOR.MINOR.PATCH" }
+```
+
+This file is the single source of truth. It is exposed at build time via
+`next.config.js` → `process.env.APP_VERSION` and displayed in the app footer.
+
+## When to bump
+
+| Change type | Bump | Example |
+|---|---|---|
+| Bug fix, refactor, copy change, dependency update | **PATCH** | 1.1.0 → 1.1.1 |
+| New feature, new UI, new integration, config change | **MINOR** | 1.1.1 → 1.2.0 |
+| Breaking change, major rewrite, schema migration | **MAJOR** | 1.2.0 → 2.0.0 |
+
+## Rules
+
+1. **Every commit must include a version bump** in `version.json`.
+   - Default to a PATCH bump unless the change clearly warrants MINOR or MAJOR.
+2. When bumping MINOR, reset PATCH to 0. When bumping MAJOR, reset MINOR and PATCH to 0.
+3. Do **not** update `package.json` version — only `version.json`.
+4. Mention the new version in the commit message, e.g.: `feat: add dark mode (v1.2.0)`.

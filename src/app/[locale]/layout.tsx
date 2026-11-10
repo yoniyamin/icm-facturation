@@ -55,6 +55,11 @@ export default function LocaleLayout({
             {children}
           </NextIntlClientProvider>
         </AuthProvider>
+        <footer className="fixed bottom-0 inset-x-0 pointer-events-none pb-1">
+          <p className="text-center text-[10px] text-gray-400">
+            v{process.env.APP_VERSION}
+          </p>
+        </footer>
       </body>
     </html>
   );

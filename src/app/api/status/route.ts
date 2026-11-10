@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/google-auth";
 import { isCloudinaryConfigured, pingCloudinary } from "@/lib/cloudinary";
+import { isVisionConfigured, pingVisionAuth } from "@/lib/google-vision";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,8 @@ interface StatusResult {
     configured: boolean;
     cloudinaryConnected: boolean;
     sheetsConnected: boolean;
+    visionEnabled: boolean;
+    visionConnected: boolean;
     error?: string;
   };
 }
@@ -30,6 +33,8 @@ export async function GET() {
   const sheetsOk = isSheetsConfigured();
   const configured = cloudinaryOk && sheetsOk;
 
+  const visionEnabled = isVisionConfigured();
+
   if (!configured) {
     const missing: string[] = [];
     if (!cloudinaryOk) missing.push("Cloudinary");
@@ -41,6 +46,8 @@ export async function GET() {
         configured: false,
         cloudinaryConnected: false,
         sheetsConnected: false,
+        visionEnabled,
+        visionConnected: false,
         error: `Not configured: ${missing.join(", ")}`,
       },
     } satisfies StatusResult);
@@ -72,6 +79,16 @@ export async function GET() {
     error = error ? `${error}; ${sheetsError}` : sheetsError;
   }
 
+  let visionConnected = false;
+  if (visionEnabled) {
+    try {
+      visionConnected = await pingVisionAuth();
+    } catch {
+      const visionError = "Vision: auth failed";
+      error = error ? `${error}; ${visionError}` : visionError;
+    }
+  }
+
   const mode =
     process.env.NEXT_PUBLIC_STORAGE_MODE === "local"
       ? "local"
@@ -85,6 +102,8 @@ export async function GET() {
       configured,
       cloudinaryConnected,
       sheetsConnected,
+      visionEnabled,
+      visionConnected,
       error,
     },
   } satisfies StatusResult);

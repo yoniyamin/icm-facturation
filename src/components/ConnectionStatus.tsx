@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Cloud, CloudOff, HardDrive, Loader2 } from "lucide-react";
+import { Cloud, CloudOff, HardDrive, Loader2, Eye, EyeOff } from "lucide-react";
 
 type StatusState = "loading" | "cloud" | "local" | "error";
 
@@ -11,6 +11,8 @@ interface StatusData {
     configured: boolean;
     cloudinaryConnected: boolean;
     sheetsConnected: boolean;
+    visionEnabled: boolean;
+    visionConnected: boolean;
     error?: string;
   };
 }
@@ -24,6 +26,7 @@ export default function ConnectionStatus({
 }: ConnectionStatusProps) {
   const [status, setStatus] = useState<StatusState>("loading");
   const [detail, setDetail] = useState<string>("");
+  const [visionStatus, setVisionStatus] = useState<"off" | "ok" | "error">("off");
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
@@ -47,6 +50,12 @@ export default function ConnectionStatus({
         } else {
           setStatus("error");
           setDetail(data.services.error || "Connection issue");
+        }
+
+        if (data.services.visionEnabled) {
+          setVisionStatus(data.services.visionConnected ? "ok" : "error");
+        } else {
+          setVisionStatus("off");
         }
       })
       .catch(() => {
@@ -109,6 +118,22 @@ export default function ConnectionStatus({
               )}
               <span>{detail}</span>
             </div>
+            <div className="mt-1.5 flex items-center gap-2 border-t border-gray-100 pt-1.5">
+              {visionStatus === "ok" ? (
+                <Eye className="h-3.5 w-3.5 shrink-0 text-green-500" />
+              ) : visionStatus === "error" ? (
+                <EyeOff className="h-3.5 w-3.5 shrink-0 text-red-500" />
+              ) : (
+                <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+              )}
+              <span>
+                {visionStatus === "ok"
+                  ? "OCR: Google Vision"
+                  : visionStatus === "error"
+                    ? "OCR: Vision error — Tesseract fallback"
+                    : "OCR: Tesseract"}
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -138,6 +163,22 @@ export default function ConnectionStatus({
               <CloudOff className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-500" />
             )}
             <span>{detail}</span>
+          </div>
+          <div className="mt-1.5 flex items-center gap-2 border-t border-gray-100 pt-1.5">
+            {visionStatus === "ok" ? (
+              <Eye className="h-3.5 w-3.5 shrink-0 text-green-500" />
+            ) : visionStatus === "error" ? (
+              <EyeOff className="h-3.5 w-3.5 shrink-0 text-red-500" />
+            ) : (
+              <EyeOff className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+            )}
+            <span>
+              {visionStatus === "ok"
+                ? "OCR: Google Vision"
+                : visionStatus === "error"
+                  ? "OCR: Vision error — Tesseract fallback"
+                  : "OCR: Tesseract"}
+            </span>
           </div>
         </div>
       )}
