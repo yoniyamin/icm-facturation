@@ -27,6 +27,7 @@ import {
 } from "@/lib/receipt-parser";
 import { parseReceiptSpatial } from "@/lib/receipt-parser-spatial";
 import type { OcrResult } from "@/lib/ocr";
+import { Eye, Cpu } from "lucide-react";
 
 interface DataPreviewProps {
   imageDataUrl: string;
@@ -359,7 +360,25 @@ export default function DataPreview({
         <h2 className="text-lg font-bold text-primary-900">
           {t("preview.title")}
         </h2>
-        <p className="text-sm text-gray-500">{t("preview.subtitle")}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-gray-500">{t("preview.subtitle")}</p>
+          {ocrResult?.engine && (
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                ocrResult.engine === "vision"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {ocrResult.engine === "vision" ? (
+                <Eye className="h-2.5 w-2.5" />
+              ) : (
+                <Cpu className="h-2.5 w-2.5" />
+              )}
+              {ocrResult.engine === "vision" ? "Vision" : "Tesseract"}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Image preview - expandable */}

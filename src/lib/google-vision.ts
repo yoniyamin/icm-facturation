@@ -205,7 +205,7 @@ export async function recognizeWithVision(
     data.responses?.[0]?.fullTextAnnotation;
 
   if (!annotation) {
-    return { text: "", lines: [], words: [], imageWidth: 0, imageHeight: 0 };
+    return { text: "", lines: [], words: [], imageWidth: 0, imageHeight: 0, engine: "vision" as const };
   }
 
   const allWords: OcrWord[] = [];
@@ -246,5 +246,6 @@ export async function recognizeWithVision(
     words: allWords,
     imageWidth,
     imageHeight,
+    engine: "vision" as const,
   };
 }

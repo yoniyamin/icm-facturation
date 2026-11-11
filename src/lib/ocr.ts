@@ -35,6 +35,7 @@ export interface OcrResult {
   words: OcrWord[];
   imageWidth: number;
   imageHeight: number;
+  engine?: "vision" | "tesseract";
 }
 
 export async function recognizeText(
@@ -110,5 +111,6 @@ export async function recognizeStructured(
     words,
     imageWidth,
     imageHeight,
+    engine: "tesseract" as const,
   };
 }
