@@ -42,9 +42,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, result });
   } catch (error) {
-    console.error("Vision OCR error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Vision OCR error:", message);
     return NextResponse.json(
-      { error: "OCR processing failed", fallback: true },
+      { error: `OCR processing failed: ${message}`, fallback: true },
       { status: 500 }
     );
   }

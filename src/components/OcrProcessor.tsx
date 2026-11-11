@@ -59,9 +59,11 @@ export default function OcrProcessor({
       body: JSON.stringify({ imageDataUrl, language: locale }),
     })
       .then(async (res) => {
-        if (!res.ok) throw new Error("fallback");
         const data = await res.json();
-        if (!data.success || !data.result) throw new Error("fallback");
+        if (!res.ok || !data.success || !data.result) {
+          console.warn("[OCR] Vision API unavailable:", data.error || res.status, "→ falling back to Tesseract");
+          throw new Error("fallback");
+        }
         return data.result as OcrResult;
       })
       .then((result) => {

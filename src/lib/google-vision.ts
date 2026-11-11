@@ -14,7 +14,7 @@ function getVisionAuth() {
   return new gauth.JWT({
     email,
     key: privateKey,
-    scopes: ["https://www.googleapis.com/auth/cloud-vision"],
+    scopes: ["https://www.googleapis.com/auth/cloud-platform"],
   });
 }
 
