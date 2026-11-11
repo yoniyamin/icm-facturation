@@ -11,6 +11,7 @@ interface StatusData {
     configured: boolean;
     cloudinaryConnected: boolean;
     sheetsConnected: boolean;
+    ocrSpaceEnabled: boolean;
     visionEnabled: boolean;
     visionConnected: boolean;
     error?: string;
@@ -27,6 +28,7 @@ export default function ConnectionStatus({
   const [status, setStatus] = useState<StatusState>("loading");
   const [detail, setDetail] = useState<string>("");
   const [visionStatus, setVisionStatus] = useState<"off" | "ok" | "error">("off");
+  const [ocrEngineName, setOcrEngineName] = useState("Tesseract");
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
@@ -52,10 +54,15 @@ export default function ConnectionStatus({
           setDetail(data.services.error || "Connection issue");
         }
 
-        if (data.services.visionEnabled) {
+        if (data.services.ocrSpaceEnabled) {
+          setVisionStatus("ok");
+          setOcrEngineName("OCR.space");
+        } else if (data.services.visionEnabled) {
           setVisionStatus(data.services.visionConnected ? "ok" : "error");
+          setOcrEngineName("Google Vision");
         } else {
           setVisionStatus("off");
+          setOcrEngineName("Tesseract");
         }
       })
       .catch(() => {
@@ -128,9 +135,9 @@ export default function ConnectionStatus({
               )}
               <span>
                 {visionStatus === "ok"
-                  ? "OCR: Google Vision"
+                  ? `OCR: ${ocrEngineName}`
                   : visionStatus === "error"
-                    ? "OCR: Vision error — Tesseract fallback"
+                    ? `OCR: ${ocrEngineName} error — Tesseract fallback`
                     : "OCR: Tesseract"}
               </span>
             </div>
@@ -174,9 +181,9 @@ export default function ConnectionStatus({
             )}
             <span>
               {visionStatus === "ok"
-                ? "OCR: Google Vision"
+                ? `OCR: ${ocrEngineName}`
                 : visionStatus === "error"
-                  ? "OCR: Vision error — Tesseract fallback"
+                  ? `OCR: ${ocrEngineName} error — Tesseract fallback`
                   : "OCR: Tesseract"}
             </span>
           </div>

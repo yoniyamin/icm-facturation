@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/google-auth";
 import { isCloudinaryConfigured, pingCloudinary } from "@/lib/cloudinary";
 import { isVisionConfigured, pingVisionAuth } from "@/lib/google-vision";
+import { isOcrSpaceConfigured } from "@/lib/ocr-space";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ interface StatusResult {
     configured: boolean;
     cloudinaryConnected: boolean;
     sheetsConnected: boolean;
+    ocrSpaceEnabled: boolean;
     visionEnabled: boolean;
     visionConnected: boolean;
     error?: string;
@@ -33,6 +35,7 @@ export async function GET() {
   const sheetsOk = isSheetsConfigured();
   const configured = cloudinaryOk && sheetsOk;
 
+  const ocrSpaceEnabled = isOcrSpaceConfigured();
   const visionEnabled = isVisionConfigured();
 
   if (!configured) {
@@ -46,6 +49,7 @@ export async function GET() {
         configured: false,
         cloudinaryConnected: false,
         sheetsConnected: false,
+        ocrSpaceEnabled,
         visionEnabled,
         visionConnected: false,
         error: `Not configured: ${missing.join(", ")}`,
@@ -102,6 +106,7 @@ export async function GET() {
       configured,
       cloudinaryConnected,
       sheetsConnected,
+      ocrSpaceEnabled,
       visionEnabled,
       visionConnected,
       error,

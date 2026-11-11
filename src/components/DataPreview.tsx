@@ -375,7 +375,7 @@ export default function DataPreview({
               ) : (
                 <Cpu className="h-2.5 w-2.5" />
               )}
-              {ocrResult.engine === "vision" ? "Vision" : "Tesseract"}
+              {ocrResult.engine === "vision" ? "Enhanced" : "Tesseract"}
             </span>
           )}
         </div>
