@@ -96,6 +96,71 @@ function vertexToBbox(vertices: VisionVertex[] | undefined) {
 }
 
 /**
+ * Group words into visual lines by Y-center position.
+ *
+ * Vision API structures output as pages → blocks → paragraphs, but
+ * paragraphs reflect semantic grouping, not visual lines.  On receipts
+ * with columnar layouts (e.g. "Total" on the left, "91.65" on the right),
+ * these end up in separate paragraphs, breaking keyword + value matching.
+ *
+ * This function clusters words whose vertical centres are within a
+ * threshold, then sorts each cluster left-to-right.
+ */
+function groupWordsIntoVisualLines(
+  words: OcrWord[],
+  imageHeight: number
+): OcrLine[] {
+  if (words.length === 0) return [];
+
+  const threshold = Math.max(imageHeight * 0.012, 8);
+
+  const sorted = [...words].sort((a, b) => {
+    const ay = (a.bbox.y0 + a.bbox.y1) / 2;
+    const by = (b.bbox.y0 + b.bbox.y1) / 2;
+    return ay - by;
+  });
+
+  const lines: OcrLine[] = [];
+  let currentGroup: OcrWord[] = [sorted[0]];
+  let groupCenterY = (sorted[0].bbox.y0 + sorted[0].bbox.y1) / 2;
+
+  for (let i = 1; i < sorted.length; i++) {
+    const w = sorted[i];
+    const cy = (w.bbox.y0 + w.bbox.y1) / 2;
+
+    if (Math.abs(cy - groupCenterY) <= threshold) {
+      currentGroup.push(w);
+      groupCenterY =
+        currentGroup.reduce((s, cw) => s + (cw.bbox.y0 + cw.bbox.y1) / 2, 0) /
+        currentGroup.length;
+    } else {
+      lines.push(buildVisualLine(currentGroup));
+      currentGroup = [w];
+      groupCenterY = cy;
+    }
+  }
+  lines.push(buildVisualLine(currentGroup));
+  return lines;
+}
+
+function buildVisualLine(words: OcrWord[]): OcrLine {
+  const ltr = [...words].sort((a, b) => a.bbox.x0 - b.bbox.x0);
+  const avgConf =
+    ltr.reduce((s, w) => s + w.confidence, 0) / ltr.length;
+  return {
+    text: ltr.map((w) => w.text).join(" "),
+    confidence: avgConf,
+    bbox: {
+      x0: Math.min(...ltr.map((w) => w.bbox.x0)),
+      y0: Math.min(...ltr.map((w) => w.bbox.y0)),
+      x1: Math.max(...ltr.map((w) => w.bbox.x1)),
+      y1: Math.max(...ltr.map((w) => w.bbox.y1)),
+    },
+    words: ltr,
+  };
+}
+
+/**
  * Call Google Cloud Vision DOCUMENT_TEXT_DETECTION and return an OcrResult
  * compatible with the spatial parser.
  */
@@ -143,8 +208,7 @@ export async function recognizeWithVision(
     return { text: "", lines: [], words: [], imageWidth: 0, imageHeight: 0 };
   }
 
-  const words: OcrWord[] = [];
-  const lines: OcrLine[] = [];
+  const allWords: OcrWord[] = [];
   let imageWidth = 0;
   let imageHeight = 0;
 
@@ -154,8 +218,6 @@ export async function recognizeWithVision(
 
     for (const block of page.blocks ?? []) {
       for (const paragraph of block.paragraphs ?? []) {
-        const lineWords: OcrWord[] = [];
-
         for (const word of paragraph.words ?? []) {
           const wordText = (word.symbols ?? [])
             .map((s) => s.text)
@@ -163,36 +225,25 @@ export async function recognizeWithVision(
           const confidence = (word.confidence ?? 0) * 100;
           const bbox = vertexToBbox(word.boundingBox?.vertices);
 
-          const ocrWord: OcrWord = {
+          allWords.push({
             text: wordText,
             confidence,
             bbox,
             isNumeric: /^\d+([.,]\d+)?$/.test(wordText),
             isBold: false,
             fontSize: bbox.y1 - bbox.y0,
-          };
-
-          lineWords.push(ocrWord);
-          words.push(ocrWord);
-        }
-
-        if (lineWords.length > 0) {
-          const paraBbox = vertexToBbox(paragraph.boundingBox?.vertices);
-          lines.push({
-            text: lineWords.map((w) => w.text).join(" "),
-            confidence: (paragraph.confidence ?? 0) * 100,
-            bbox: paraBbox,
-            words: lineWords,
           });
         }
       }
     }
   }
 
+  const lines = groupWordsIntoVisualLines(allWords, imageHeight);
+
   return {
     text: annotation.text ?? "",
     lines,
-    words,
+    words: allWords,
     imageWidth,
     imageHeight,
   };

@@ -47,22 +47,31 @@ export function parseReceiptSpatial(ocrResult: OcrResult): ParsedReceipt {
     hasKeyword: boolean;
   }[] = [];
 
-  for (const line of confidentLines) {
+  for (let idx = 0; idx < confidentLines.length; idx++) {
+    const line = confidentLines[idx];
     const amount = extractAmountFromLine(line);
     if (!amount) continue;
 
     const hasKeyword = TOTAL_KEYWORDS.test(line.text);
     const hasCurrency = CURRENCY_RE.test(line.text);
 
+    const prevLine = idx > 0 ? confidentLines[idx - 1] : null;
+    const nextLine =
+      idx < confidentLines.length - 1 ? confidentLines[idx + 1] : null;
+    const adjacentKeyword =
+      (prevLine && TOTAL_KEYWORDS.test(prevLine.text)) ||
+      (nextLine && TOTAL_KEYWORDS.test(nextLine.text));
+
     let confidence: ParsedField["confidence"] = "low";
     if (hasKeyword && hasCurrency) confidence = "high";
-    else if (hasKeyword || hasCurrency) confidence = "medium";
+    else if (hasKeyword || (adjacentKeyword && hasCurrency)) confidence = "high";
+    else if (hasKeyword || adjacentKeyword || hasCurrency) confidence = "medium";
 
     amountCandidates.push({
       value: amount,
       confidence,
       y: line.bbox.y0,
-      hasKeyword,
+      hasKeyword: hasKeyword || !!adjacentKeyword,
     });
   }
 
@@ -164,6 +173,13 @@ export function parseReceiptSpatial(ocrResult: OcrResult): ParsedReceipt {
 
   if (topLines.length > 0) {
     const sorted = [...topLines].sort((a, b) => {
+      const aFontSize = a.words.length
+        ? Math.max(...a.words.map((w) => w.fontSize))
+        : 0;
+      const bFontSize = b.words.length
+        ? Math.max(...b.words.map((w) => w.fontSize))
+        : 0;
+      if (Math.abs(bFontSize - aFontSize) > 5) return bFontSize - aFontSize;
       const confDiff = b.confidence - a.confidence;
       if (Math.abs(confDiff) > 10) return confDiff;
       return b.text.trim().length - a.text.trim().length;
@@ -171,12 +187,16 @@ export function parseReceiptSpatial(ocrResult: OcrResult): ParsedReceipt {
     const best = sorted[0];
 
     const hasBoldWords = best.words.some((w) => w.isBold);
+    const hasLargeFont =
+      best.words.length > 0 &&
+      Math.max(...best.words.map((w) => w.fontSize)) > imageHeight * 0.025;
 
     fields.push({
       key: "businessName",
       label: "businessName",
       value: best.text.trim(),
-      confidence: hasBoldWords || best.confidence > 80 ? "medium" : "low",
+      confidence:
+        hasBoldWords || hasLargeFont || best.confidence > 80 ? "medium" : "low",
     });
   }
 
