@@ -365,17 +365,23 @@ export default function DataPreview({
           {ocrResult?.engine && (
             <span
               className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                ocrResult.engine === "vision"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-600"
+                ocrResult.engine === "ocrspace"
+                  ? "bg-blue-100 text-blue-700"
+                  : ocrResult.engine === "vision"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-600"
               }`}
             >
-              {ocrResult.engine === "vision" ? (
-                <Eye className="h-2.5 w-2.5" />
-              ) : (
+              {ocrResult.engine === "tesseract" ? (
                 <Cpu className="h-2.5 w-2.5" />
+              ) : (
+                <Eye className="h-2.5 w-2.5" />
               )}
-              {ocrResult.engine === "vision" ? "Enhanced" : "Tesseract"}
+              {ocrResult.engine === "ocrspace"
+                ? "OCR.space"
+                : ocrResult.engine === "vision"
+                  ? "Google Vision"
+                  : "Tesseract"}
             </span>
           )}
         </div>

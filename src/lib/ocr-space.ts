@@ -146,6 +146,6 @@ export async function recognizeWithOcrSpace(
     words: allWords,
     imageWidth,
     imageHeight,
-    engine: "vision" as const,
+    engine: "ocrspace" as const,
   };
 }

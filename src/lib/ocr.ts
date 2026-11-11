@@ -35,7 +35,7 @@ export interface OcrResult {
   words: OcrWord[];
   imageWidth: number;
   imageHeight: number;
-  engine?: "vision" | "tesseract";
+  engine?: "vision" | "tesseract" | "ocrspace";
 }
 
 export async function recognizeText(
